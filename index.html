@@ -124,7 +124,7 @@
        </div>
       </div>
       <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
-       <h3 class="text-sm font-semibold text-gray-300 mb-4">🏭 TEMUAN PER AREA</h3>
+       <h3 class="text-sm font-semibold text-gray-300 mb-4">�� TEMUAN PER AREA</h3>
        <div class="h-64">
         <canvas id="chart-area"></canvas>
        </div>
@@ -425,16 +425,23 @@
 
     // Setup Real-time Subscriptions
     function setupRealtimeSubscriptions() {
-      // Subscribe to all tables
+      // Subscribe to all tables with proper handlers
       const tables = ['operators', 'products', 'areas', 'categories', 'targets', 'findings', 'audit_logs'];
       
       tables.forEach(table => {
         const subscription = supabaseClient
           .channel(`${table}_changes`)
-          .on('postgres_changes', { event: '*', schema: 'public', table: table }, () => {
+          .on('postgres_changes', { 
+            event: '*', 
+            schema: 'public', 
+            table: table 
+          }, (payload) => {
+            console.log(`Real-time update detected on ${table}:`, payload);
             loadAllData();
           })
-          .subscribe();
+          .subscribe((status) => {
+            console.log(`Subscription status for ${table}:`, status);
+          });
         
         subscriptions.push(subscription);
       });
@@ -1105,6 +1112,9 @@
         await addAuditLog('CREATE', `NEW FINDING: BATCH ${batchNumber}, AREA ${area}`, area, product, category, operator);
         showToast('TEMUAN BERHASIL DISIMPAN', 'success');
         document.getElementById('finding-form').reset();
+        
+        // Force immediate reload
+        await loadAllData();
       } catch (error) {
         console.error('Error saving finding:', error);
         showToast('GAGAL MENYIMPAN TEMUAN: ' + error.message, 'error');
@@ -1155,6 +1165,9 @@
 
         await addAuditLog('CREATE', `NEW ${type.toUpperCase()}: ${value}`);
         showToast(`${type.toUpperCase()} BERHASIL DITAMBAHKAN`, 'success');
+        
+        // Force immediate reload
+        await loadAllData();
       } catch (error) {
         console.error('Error adding master data:', error);
         showToast('GAGAL MENAMBAHKAN DATA: ' + error.message, 'error');
@@ -1196,6 +1209,9 @@
 
         await addAuditLog('CREATE', `NEW TARGET: ${month} = ${value}`);
         showToast('TARGET BERHASIL DITAMBAHKAN', 'success');
+        
+        // Force immediate reload
+        await loadAllData();
       } catch (error) {
         console.error('Error adding target:', error);
         showToast('GAGAL MENAMBAHKAN TARGET: ' + error.message, 'error');
@@ -1314,5 +1330,5 @@
 
     init();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c1dd21131779610',t:'MTc2OTA3MjAwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c1dda14f3999610',t:'MTc2OTA3MjMzMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
