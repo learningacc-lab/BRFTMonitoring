@@ -847,7 +847,7 @@
             const monthFindings = findings.filter(f => f.date && f.date.startsWith(t.target_month)).length;
             const brft = calculateBRFT(t.target_month, t.target_value, monthFindings);
             return `
-              <div class="flex items-center justify-between bg-gray-700 rounded-lg px-4 py-3" data-id="${t.__backendId}">
+              <div class="flex items-center justify-between bg-gray-700 rounded-lg px-4 py-3" data-id="${t.id}">
                 <div class="flex-1">
                   <span class="font-medium">${t.target_month}</span>
                   <span class="text-gray-400 ml-2">TARGET: ${t.target_value}</span>
@@ -855,8 +855,8 @@
                   <span class="ml-2 ${brft >= 95 ? 'text-emerald-400' : brft >= 90 ? 'text-amber-400' : 'text-red-400'}">${brft !== null ? brft.toFixed(1) + '%' : '-'}</span>
                 </div>
                 <div class="flex gap-2">
-                  <button class="edit-target text-blue-400 hover:text-blue-300 p-1" data-id="${t.__backendId}">✏️</button>
-                  <button class="delete-target text-red-400 hover:text-red-300 p-1" data-id="${t.__backendId}">🗑️</button>
+                  <button class="edit-target text-blue-400 hover:text-blue-300 p-1" data-id="${t.id}">✏️</button>
+                  <button class="delete-target text-red-400 hover:text-red-300 p-1" data-id="${t.id}">🗑️</button>
                 </div>
               </div>
             `;
@@ -866,12 +866,12 @@
       document.getElementById('findings-mgmt-list').innerHTML = findings.length === 0
         ? '<tr><td colspan="4" class="py-8 text-center text-gray-500">TIDAK ADA DATA</td></tr>'
         : findings.sort((a, b) => new Date(b.date) - new Date(a.date)).map(f => `
-            <tr class="hover:bg-gray-700/50" data-id="${f.__backendId}">
+            <tr class="hover:bg-gray-700/50" data-id="${f.id}">
               <td class="py-2 px-2 text-gray-300">${f.date || '-'}</td>
-              <td class="py-2 px-2 text-gray-300">${f.area || '-'}</td>
+              <td class="py-2 px-2 text-gray-300">${f.area_name || '-'}</td>
               <td class="py-2 px-2 text-gray-300">${f.batch_number || '-'}</td>
               <td class="py-2 px-2">
-                <button class="delete-finding text-red-400 hover:text-red-300" data-id="${f.__backendId}">🗑️</button>
+                <button class="delete-finding text-red-400 hover:text-red-300" data-id="${f.id}">🗑️</button>
               </td>
             </tr>
           `).join('');
@@ -882,11 +882,11 @@
 
     function createMasterItem(item, type) {
       return `
-        <div class="flex items-center justify-between bg-gray-700 rounded-lg px-4 py-3" data-id="${item.__backendId}">
+        <div class="flex items-center justify-between bg-gray-700 rounded-lg px-4 py-3" data-id="${item.id}">
           <span class="font-medium">${item.name}</span>
           <div class="flex gap-2">
-            <button class="edit-${type} text-blue-400 hover:text-blue-300 p-1" data-id="${item.__backendId}">✏️</button>
-            <button class="delete-${type} text-red-400 hover:text-red-300 p-1" data-id="${item.__backendId}">🗑️</button>
+            <button class="edit-${type} text-blue-400 hover:text-blue-300 p-1" data-id="${item.id}">✏️</button>
+            <button class="delete-${type} text-red-400 hover:text-red-300 p-1" data-id="${item.id}">🗑️</button>
           </div>
         </div>
       `;
@@ -941,22 +941,56 @@
     function openDeleteModal(type, id) {
       document.getElementById('delete-modal').classList.remove('hidden');
       deleteCallback = async () => {
-        const item = allData.find(d => d.__backendId === id);
-        if (item) {
-          const result = await window.dataSdk.delete(item);
-          if (result.isOk) {
-            await addAuditLog('DELETE', `DELETED ${type.toUpperCase()}: ${item.name || item.target_month || item.batch_number || id}`);
-            showToast('DATA BERHASIL DIHAPUS', 'success');
-          } else {
-            showToast('GAGAL MENGHAPUS DATA', 'error');
+        try {
+          let tableName = '';
+          let item = null;
+
+          if (type === 'operator') {
+            tableName = 'operators';
+            item = operators.find(o => o.id === parseInt(id));
+          } else if (type === 'product') {
+            tableName = 'products';
+            item = products.find(p => p.id === parseInt(id));
+          } else if (type === 'area') {
+            tableName = 'areas';
+            item = areas.find(a => a.id === parseInt(id));
+          } else if (type === 'category') {
+            tableName = 'categories';
+            item = categories.find(c => c.id === parseInt(id));
+          } else if (type === 'target') {
+            tableName = 'targets';
+            item = targets.find(t => t.id === parseInt(id));
+          } else if (type === 'finding') {
+            tableName = 'findings';
+            item = findings.find(f => f.id === parseInt(id));
           }
+
+          if (!item || !tableName) {
+            showToast('DATA TIDAK DITEMUKAN', 'error');
+            document.getElementById('delete-modal').classList.add('hidden');
+            return;
+          }
+
+          const { error } = await supabaseClient.from(tableName).delete().eq('id', item.id);
+          if (error) throw error;
+
+          await addAuditLog('DELETE', `DELETED ${type.toUpperCase()}: ${item.name || item.target_month || item.batch_number || id}`);
+          showToast('DATA BERHASIL DIHAPUS', 'success');
+        } catch (error) {
+          console.error('Error deleting:', error);
+          showToast('GAGAL MENGHAPUS DATA: ' + error.message, 'error');
         }
         document.getElementById('delete-modal').classList.add('hidden');
       };
     }
 
     function openEditModal(type, id) {
-      const item = allData.find(d => d.__backendId === id);
+      let item = null;
+      if (type === 'operator') item = operators.find(o => o.id === parseInt(id));
+      else if (type === 'product') item = products.find(p => p.id === parseInt(id));
+      else if (type === 'area') item = areas.find(a => a.id === parseInt(id));
+      else if (type === 'category') item = categories.find(c => c.id === parseInt(id));
+
       if (!item) return;
 
       document.getElementById('edit-value').value = item.name || '';
@@ -969,21 +1003,29 @@
           return;
         }
 
-        const oldValue = item.name;
-        item.name = newValue;
-        const result = await window.dataSdk.update(item);
-        if (result.isOk) {
+        try {
+          let tableName = '';
+          if (type === 'operator') tableName = 'operators';
+          else if (type === 'product') tableName = 'products';
+          else if (type === 'area') tableName = 'areas';
+          else if (type === 'category') tableName = 'categories';
+
+          const oldValue = item.name;
+          const { error } = await supabaseClient.from(tableName).update({ name: newValue }).eq('id', item.id);
+          if (error) throw error;
+
           await addAuditLog('UPDATE', `UPDATED ${type.toUpperCase()}: ${oldValue} → ${newValue}`);
           showToast('DATA BERHASIL DIUPDATE', 'success');
-        } else {
-          showToast('GAGAL UPDATE DATA', 'error');
+        } catch (error) {
+          console.error('Error updating:', error);
+          showToast('GAGAL UPDATE DATA: ' + error.message, 'error');
         }
         document.getElementById('edit-modal').classList.add('hidden');
       };
     }
 
     function openEditTargetModal(id) {
-      const target = targets.find(t => t.__backendId === id);
+      const target = targets.find(t => t.id === parseInt(id));
       if (!target) return;
 
       document.getElementById('edit-value').value = target.target_value || '';
@@ -996,14 +1038,16 @@
           return;
         }
 
-        const oldValue = target.target_value;
-        target.target_value = newValue;
-        const result = await window.dataSdk.update(target);
-        if (result.isOk) {
+        try {
+          const oldValue = target.target_value;
+          const { error } = await supabaseClient.from('targets').update({ target_value: newValue }).eq('id', target.id);
+          if (error) throw error;
+
           await addAuditLog('UPDATE', `UPDATED TARGET ${target.target_month}: ${oldValue} → ${newValue}`);
           showToast('TARGET BERHASIL DIUPDATE', 'success');
-        } else {
-          showToast('GAGAL UPDATE TARGET', 'error');
+        } catch (error) {
+          console.error('Error updating target:', error);
+          showToast('GAGAL UPDATE TARGET: ' + error.message, 'error');
         }
         document.getElementById('edit-modal').classList.add('hidden');
       };
@@ -1027,34 +1071,43 @@
     document.getElementById('finding-form').addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      if (allData.length >= 999) {
-        showToast('BATAS MAKSIMAL 999 RECORD TERCAPAI', 'error');
-        return;
-      }
-
       const btn = document.getElementById('submit-finding');
       btn.disabled = true;
       btn.innerHTML = '⏳ MENYIMPAN...';
 
-      const data = {
-        record_type: 'finding',
-        date: document.getElementById('input-date').value,
-        area: document.getElementById('input-area').value,
-        category: document.getElementById('input-category').value,
-        product_code: document.getElementById('input-product').value,
-        batch_number: document.getElementById('input-batch').value.toUpperCase(),
-        operator_initial: document.getElementById('input-operator').value,
-        description: document.getElementById('input-description').value.toUpperCase(),
-        created_at: new Date().toISOString()
-      };
+      const areaId = parseInt(document.getElementById('input-area').value);
+      const categoryId = parseInt(document.getElementById('input-category').value);
+      const productId = parseInt(document.getElementById('input-product').value);
+      const operatorId = parseInt(document.getElementById('input-operator').value);
+      const batchNumber = document.getElementById('input-batch').value.toUpperCase();
+      const description = document.getElementById('input-description').value.toUpperCase();
+      const date = document.getElementById('input-date').value;
 
-      const result = await window.dataSdk.create(data);
-      if (result.isOk) {
-        await addAuditLog('CREATE', `NEW FINDING: BATCH ${data.batch_number}, AREA ${data.area}`, data.area, data.product_code, data.category, data.operator_initial);
+      try {
+        const { data, error } = await supabaseClient.from('findings').insert({
+          date: date,
+          area_id: areaId,
+          category_id: categoryId,
+          product_id: productId,
+          operator_id: operatorId,
+          batch_number: batchNumber,
+          description: description
+        }).select();
+
+        if (error) throw error;
+
+        // Get names for audit log
+        const area = areas.find(a => a.id === areaId)?.name || '';
+        const product = products.find(p => p.id === productId)?.name || '';
+        const category = categories.find(c => c.id === categoryId)?.name || '';
+        const operator = operators.find(o => o.id === operatorId)?.name || '';
+
+        await addAuditLog('CREATE', `NEW FINDING: BATCH ${batchNumber}, AREA ${area}`, area, product, category, operator);
         showToast('TEMUAN BERHASIL DISIMPAN', 'success');
         document.getElementById('finding-form').reset();
-      } else {
-        showToast('GAGAL MENYIMPAN TEMUAN', 'error');
+      } catch (error) {
+        console.error('Error saving finding:', error);
+        showToast('GAGAL MENYIMPAN TEMUAN: ' + error.message, 'error');
       }
 
       btn.disabled = false;
@@ -1085,12 +1138,7 @@
     });
 
     // Add Master Data
-    async function addMasterData(type, inputId, recordType) {
-      if (allData.length >= 999) {
-        showToast('BATAS MAKSIMAL 999 RECORD TERCAPAI', 'error');
-        return;
-      }
-
+    async function addMasterData(type, inputId, tableName) {
       const input = document.getElementById(inputId);
       const value = input.value.trim().toUpperCase();
       if (!value) {
@@ -1101,32 +1149,25 @@
       // Clear input immediately
       input.value = '';
 
-      const result = await window.dataSdk.create({
-        record_type: recordType,
-        name: value,
-        created_at: new Date().toISOString()
-      });
+      try {
+        const { data, error } = await supabaseClient.from(tableName).insert({ name: value }).select();
+        if (error) throw error;
 
-      if (result.isOk) {
         await addAuditLog('CREATE', `NEW ${type.toUpperCase()}: ${value}`);
         showToast(`${type.toUpperCase()} BERHASIL DITAMBAHKAN`, 'success');
-      } else {
-        showToast('GAGAL MENAMBAHKAN DATA', 'error');
+      } catch (error) {
+        console.error('Error adding master data:', error);
+        showToast('GAGAL MENAMBAHKAN DATA: ' + error.message, 'error');
       }
     }
 
-    document.getElementById('add-operator').addEventListener('click', () => addMasterData('operator', 'new-operator', 'operator'));
-    document.getElementById('add-product').addEventListener('click', () => addMasterData('product', 'new-product', 'product'));
-    document.getElementById('add-area').addEventListener('click', () => addMasterData('area', 'new-area', 'area'));
-    document.getElementById('add-category').addEventListener('click', () => addMasterData('category', 'new-category', 'category'));
+    document.getElementById('add-operator').addEventListener('click', () => addMasterData('operator', 'new-operator', 'operators'));
+    document.getElementById('add-product').addEventListener('click', () => addMasterData('product', 'new-product', 'products'));
+    document.getElementById('add-area').addEventListener('click', () => addMasterData('area', 'new-area', 'areas'));
+    document.getElementById('add-category').addEventListener('click', () => addMasterData('category', 'new-category', 'categories'));
 
     // Add Target
     document.getElementById('add-target').addEventListener('click', async () => {
-      if (allData.length >= 999) {
-        showToast('BATAS MAKSIMAL 999 RECORD TERCAPAI', 'error');
-        return;
-      }
-
       const month = document.getElementById('new-target-month').value;
       const value = parseInt(document.getElementById('new-target-value').value);
 
@@ -1145,18 +1186,19 @@
       document.getElementById('new-target-month').value = '';
       document.getElementById('new-target-value').value = '';
 
-      const result = await window.dataSdk.create({
-        record_type: 'target',
-        target_month: month,
-        target_value: value,
-        created_at: new Date().toISOString()
-      });
+      try {
+        const { data, error } = await supabaseClient.from('targets').insert({
+          target_month: month,
+          target_value: value
+        }).select();
 
-      if (result.isOk) {
+        if (error) throw error;
+
         await addAuditLog('CREATE', `NEW TARGET: ${month} = ${value}`);
         showToast('TARGET BERHASIL DITAMBAHKAN', 'success');
-      } else {
-        showToast('GAGAL MENAMBAHKAN TARGET', 'error');
+      } catch (error) {
+        console.error('Error adding target:', error);
+        showToast('GAGAL MENAMBAHKAN TARGET: ' + error.message, 'error');
       }
     });
 
@@ -1252,12 +1294,11 @@
 
     // Initialize Data SDK
     async function init() {
-      if (window.dataSdk) {
-        const result = await window.dataSdk.init(dataHandler);
-        if (!result.isOk) {
-          showToast('GAGAL MENGINISIALISASI DATABASE', 'error');
-        }
-      }
+      // Load data from Supabase
+      await loadAllData();
+
+      // Setup real-time subscriptions
+      setupRealtimeSubscriptions();
 
       // Auto-fill date filters with current month range
       const now = new Date();
@@ -1273,5 +1314,5 @@
 
     init();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c1dca7a97ecfe86',t:'MTc2OTA3MTY5Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c1dd21131779610',t:'MTc2OTA3MjAwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
