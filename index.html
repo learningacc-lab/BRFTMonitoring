@@ -1277,6 +1277,27 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
+      // Get filtered logs (same as currently displayed in table)
+      const dateFrom = document.getElementById('audit-date-from').value;
+      const dateTo = document.getElementById('audit-date-to').value;
+      const area = document.getElementById('audit-filter-area').value;
+      const product = document.getElementById('audit-filter-product').value;
+      const category = document.getElementById('audit-filter-category').value;
+      const initial = document.getElementById('audit-filter-initial').value;
+
+      let filtered = [...auditLogs];
+      if (dateFrom) filtered = filtered.filter(l => l.created_at >= dateFrom);
+      if (dateTo) filtered = filtered.filter(l => l.created_at <= dateTo + 'T23:59:59');
+      if (area) filtered = filtered.filter(l => l.area === area);
+      if (product) filtered = filtered.filter(l => l.product === product);
+      if (category) filtered = filtered.filter(l => l.category === category);
+      if (initial) filtered = filtered.filter(l => l.operator_initial === initial);
+
+      if (filtered.length === 0) {
+        showToast('TIDAK ADA DATA UNTUK DIEXPORT', 'error');
+        return;
+      }
+
       doc.setFontSize(16);
       doc.text('BRFT AUDIT TRAIL REPORT', 105, 20, { align: 'center' });
       doc.setFontSize(10);
@@ -1292,27 +1313,39 @@
       doc.line(15, y, 195, y);
       y += 5;
 
-      // Get current filtered logs from table
-      const tbody = document.getElementById('audit-table');
-      const rows = tbody.querySelectorAll('tr');
-      
-      if (rows.length === 1 && rows[0].textContent.includes('TIDAK ADA LOG')) {
-        showToast('TIDAK ADA DATA UNTUK DIEXPORT', 'error');
-        return;
-      }
-
-      rows.forEach(row => {
+      filtered.forEach(log => {
         if (y > 280) {
           doc.addPage();
           y = 20;
         }
-        const cells = row.querySelectorAll('td');
-        if (cells.length >= 3) {
-          doc.text(cells[0].textContent.substring(0, 20), 15, y);
-          doc.text(cells[1].textContent.substring(0, 15), 70, y);
-          doc.text(cells[2].textContent.substring(0, 60), 100, y);
-          y += 6;
-        }
+
+        // Format timestamp properly
+        const timestamp = new Date(log.created_at).toLocaleString('ID-id', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+        doc.text(timestamp, 15, y);
+        doc.text(log.action || '', 70, y);
+        
+        // Wrap long details text
+        const details = log.details || '';
+        const maxWidth = 90;
+        const lines = doc.splitTextToSize(details, maxWidth);
+        
+        lines.forEach((line, idx) => {
+          if (y > 280) {
+            doc.addPage();
+            y = 20;
+          }
+          doc.text(line, 100, y);
+          if (idx < lines.length - 1) y += 4;
+        });
+        
+        y += 6;
       });
 
       doc.save(`BRFT_AUDIT_${new Date().toISOString().split('T')[0]}.pdf`);
@@ -1354,5 +1387,5 @@
 
     init();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c200e57f384ff78',t:'MTc2OTA5NTQ0My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c2010a8f722ff78',t:'MTc2OTA5NTUzOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
