@@ -435,9 +435,9 @@
             event: '*', 
             schema: 'public', 
             table: table 
-          }, (payload) => {
+          }, async (payload) => {
             console.log(`Real-time update detected on ${table}:`, payload);
-            loadAllData();
+            await loadAllData();
           })
           .subscribe((status) => {
             console.log(`Subscription status for ${table}:`, status);
@@ -982,6 +982,10 @@
           if (error) throw error;
 
           await addAuditLog('DELETE', `DELETED ${type.toUpperCase()}: ${item.name || item.target_month || item.batch_number || id}`);
+          
+          // Force immediate reload
+          await loadAllData();
+          
           showToast('DATA BERHASIL DIHAPUS', 'success');
         } catch (error) {
           console.error('Error deleting:', error);
@@ -1022,6 +1026,10 @@
           if (error) throw error;
 
           await addAuditLog('UPDATE', `UPDATED ${type.toUpperCase()}: ${oldValue} → ${newValue}`);
+          
+          // Force immediate reload
+          await loadAllData();
+          
           showToast('DATA BERHASIL DIUPDATE', 'success');
         } catch (error) {
           console.error('Error updating:', error);
@@ -1051,6 +1059,10 @@
           if (error) throw error;
 
           await addAuditLog('UPDATE', `UPDATED TARGET ${target.target_month}: ${oldValue} → ${newValue}`);
+          
+          // Force immediate reload
+          await loadAllData();
+          
           showToast('TARGET BERHASIL DIUPDATE', 'success');
         } catch (error) {
           console.error('Error updating target:', error);
@@ -1342,5 +1354,5 @@
 
     init();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c1ffcf8651d7a69',t:'MTc2OTA5NDczMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c200e57f384ff78',t:'MTc2OTA5NTQ0My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
