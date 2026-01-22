@@ -1,0 +1,1277 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BRFT MONITORING SYSTEM</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body { box-sizing: border-box; }
+    * { font-family: 'Rajdhani', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; }
+    .toast {
+      position: fixed; top: 20px; right: 20px; padding: 16px 24px;
+      border-radius: 8px; z-index: 9999; animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .tab-active { border-bottom: 3px solid #10b981; color: #10b981; }
+    .card-shadow { box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #1f2937; }
+    ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full bg-gray-900 text-gray-100">
+  <div id="app" class="h-full w-full flex flex-col overflow-auto"><!-- Header -->
+   <header class="bg-gray-800 border-b border-gray-700 px-6 py-4 flex items-center justify-between flex-shrink-0">
+    <div class="flex items-center gap-4">
+     <div class="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center">
+      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+     </div>
+     <div>
+      <h1 id="app-title" class="text-xl font-bold text-emerald-400">BRFT MONITORING SYSTEM</h1>
+      <p id="company-name" class="text-xs text-gray-400">PHARMA QUALITY CONTROL</p>
+     </div>
+    </div>
+    <div class="flex items-center gap-4"><span id="current-date" class="text-sm text-gray-400"></span> <button id="theme-toggle" class="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg></button>
+    </div>
+   </header><!-- Navigation Tabs -->
+   <nav class="bg-gray-800 border-b border-gray-700 px-6 flex-shrink-0">
+    <div class="flex gap-1 overflow-x-auto"><button class="tab-btn tab-active px-4 py-3 text-sm font-medium transition hover:text-emerald-400" data-tab="dashboard"> 📊 DASHBOARD </button> <button class="tab-btn px-4 py-3 text-sm font-medium text-gray-400 transition hover:text-emerald-400" data-tab="input"> ➕ INPUT BRFT </button> <button class="tab-btn px-4 py-3 text-sm font-medium text-gray-400 transition hover:text-emerald-400" data-tab="management"> ⚙️ MANAGEMENT </button> <button class="tab-btn px-4 py-3 text-sm font-medium text-gray-400 transition hover:text-emerald-400" data-tab="audit"> 📋 AUDIT TRAIL </button>
+    </div>
+   </nav><!-- Main Content -->
+   <main class="flex-1 p-6 overflow-auto"><!-- Dashboard Tab -->
+    <div id="dashboard-tab" class="tab-content"><!-- Summary Cards -->
+     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
+       <div class="flex items-center justify-between">
+        <div>
+         <p class="text-xs text-gray-400 mb-1">TOTAL TEMUAN</p>
+         <p id="total-findings" class="text-3xl font-bold text-white">0</p>
+        </div>
+        <div class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center">
+         <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+         </svg>
+        </div>
+       </div>
+      </div>
+      <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
+       <div class="flex items-center justify-between">
+        <div>
+         <p class="text-xs text-gray-400 mb-1">TARGET DOKUMEN</p>
+         <p id="target-docs" class="text-3xl font-bold text-blue-400">0</p>
+        </div>
+        <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
+         <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+         </svg>
+        </div>
+       </div>
+      </div>
+      <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
+       <div class="flex items-center justify-between">
+        <div>
+         <p class="text-xs text-gray-400 mb-1">% BRFT BULAN INI</p>
+         <p id="brft-percentage" class="text-3xl font-bold">-</p>
+        </div>
+        <div id="brft-indicator" class="w-12 h-12 bg-gray-500/20 rounded-xl flex items-center justify-center">
+         <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+         </svg>
+        </div>
+       </div>
+      </div>
+     </div><!-- Filters -->
+     <div class="bg-gray-800 rounded-xl p-4 mb-6 card-shadow border border-gray-700">
+      <div class="flex flex-wrap gap-3 items-end">
+       <div class="flex-1 min-w-[150px]"><label class="block text-xs text-gray-400 mb-1">DARI TANGGAL</label> <input type="date" id="filter-date-from" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+       </div>
+       <div class="flex-1 min-w-[150px]"><label class="block text-xs text-gray-400 mb-1">SAMPAI TANGGAL</label> <input type="date" id="filter-date-to" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+       </div>
+       <div class="flex-1 min-w-[150px]"><label class="block text-xs text-gray-400 mb-1">AREA</label> <select id="filter-area" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <option value="">SEMUA AREA</option> </select>
+       </div>
+       <div class="flex-1 min-w-[150px]"><label class="block text-xs text-gray-400 mb-1">KODE PRODUK</label> <select id="filter-product" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <option value="">SEMUA PRODUK</option> </select>
+       </div>
+       <div class="flex-1 min-w-[150px]"><label class="block text-xs text-gray-400 mb-1">KATEGORI</label> <select id="filter-category" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <option value="">SEMUA KATEGORI</option> </select>
+       </div>
+       <div class="flex-1 min-w-[150px]"><label class="block text-xs text-gray-400 mb-1">INISIAL OPERATOR</label> <select id="filter-operator" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <option value="">SEMUA OPERATOR</option> </select>
+       </div><button id="apply-filter" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition"> ��� FILTER </button> <button id="reset-filter" class="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded-lg text-sm font-medium transition"> ↺ RESET </button>
+      </div>
+     </div><!-- Charts Grid -->
+     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
+       <h3 class="text-sm font-semibold text-gray-300 mb-4">���� TREND % BRFT PER BULAN</h3>
+       <div class="h-64">
+        <canvas id="chart-trend"></canvas>
+       </div>
+      </div>
+      <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
+       <h3 class="text-sm font-semibold text-gray-300 mb-4">📊 TEMUAN PER BULAN</h3>
+       <div class="h-64">
+        <canvas id="chart-monthly"></canvas>
+       </div>
+      </div>
+      <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
+       <h3 class="text-sm font-semibold text-gray-300 mb-4">🏭 TEMUAN PER AREA</h3>
+       <div class="h-64">
+        <canvas id="chart-area"></canvas>
+       </div>
+      </div>
+      <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
+       <h3 class="text-sm font-semibold text-gray-300 mb-4">��� TEMUAN PER KODE PRODUK</h3>
+       <div class="h-64">
+        <canvas id="chart-product"></canvas>
+       </div>
+      </div>
+      <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
+       <h3 class="text-sm font-semibold text-gray-300 mb-4">👤 TEMUAN PER OPERATOR</h3>
+       <div class="h-64">
+        <canvas id="chart-operator"></canvas>
+       </div>
+      </div>
+      <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
+       <h3 class="text-sm font-semibold text-gray-300 mb-4">🏷️ TEMUAN PER KATEGORI</h3>
+       <div class="h-64">
+        <canvas id="chart-category"></canvas>
+       </div>
+      </div>
+     </div><!-- Data Table -->
+     <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
+      <h3 class="text-sm font-semibold text-gray-300 mb-4">📋 DETAIL TEMUAN</h3>
+      <div class="overflow-x-auto">
+       <table class="w-full text-sm">
+        <thead>
+         <tr class="border-b border-gray-700">
+          <th class="text-left py-3 px-3 text-gray-400 font-medium">TANGGAL</th>
+          <th class="text-left py-3 px-3 text-gray-400 font-medium">INISIAL</th>
+          <th class="text-left py-3 px-3 text-gray-400 font-medium">AREA</th>
+          <th class="text-left py-3 px-3 text-gray-400 font-medium">KATEGORI</th>
+          <th class="text-left py-3 px-3 text-gray-400 font-medium">NO. BATCH</th>
+          <th class="text-left py-3 px-3 text-gray-400 font-medium">TEMUAN PPI</th>
+         </tr>
+        </thead>
+        <tbody id="findings-table" class="divide-y divide-gray-700">
+         <tr>
+          <td colspan="6" class="py-8 text-center text-gray-500">TIDAK ADA DATA</td>
+         </tr>
+        </tbody>
+       </table>
+      </div>
+     </div>
+    </div><!-- Input Tab -->
+    <div id="input-tab" class="tab-content hidden">
+     <div class="max-w-2xl mx-auto">
+      <div class="bg-gray-800 rounded-xl p-6 card-shadow border border-gray-700">
+       <h2 class="text-lg font-bold text-emerald-400 mb-6 flex items-center gap-2"><span>���</span> INPUT TEMUAN BRFT</h2>
+       <form id="finding-form" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+         <div><label class="block text-xs text-gray-400 mb-1">TANGGAL TEMUAN *</label> <input type="date" id="input-date" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+         </div>
+         <div><label class="block text-xs text-gray-400 mb-1">AREA PRODUKSI *</label> <select id="input-area" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500"> <option value="">PILIH AREA</option> </select>
+         </div>
+         <div><label class="block text-xs text-gray-400 mb-1">KATEGORI TEMUAN *</label> <select id="input-category" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500"> <option value="">PILIH KATEGORI</option> </select>
+         </div>
+         <div><label class="block text-xs text-gray-400 mb-1">KODE PRODUK *</label> <select id="input-product" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500"> <option value="">PILIH PRODUK</option> </select>
+         </div>
+         <div><label class="block text-xs text-gray-400 mb-1">NOMOR BATCH *</label> <input type="text" id="input-batch" required placeholder="MASUKKAN NO. BATCH" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500 placeholder-gray-500">
+         </div>
+         <div><label class="block text-xs text-gray-400 mb-1">INISIAL OPERATOR *</label> <select id="input-operator" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500"> <option value="">PILIH OPERATOR</option> </select>
+         </div>
+        </div>
+        <div><label class="block text-xs text-gray-400 mb-1">DESKRIPSI TEMUAN PPI *</label> <textarea id="input-description" required rows="4" placeholder="JELASKAN TEMUAN SECARA DETAIL..." class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500 placeholder-gray-500 resize-none"></textarea>
+        </div>
+        <div class="flex gap-3 pt-2"><button type="submit" id="submit-finding" class="flex-1 bg-emerald-600 hover:bg-emerald-700 py-3 rounded-lg font-medium transition flex items-center justify-center gap-2"> <span>💾</span> SIMPAN TEMUAN </button> <button type="reset" class="px-6 bg-gray-600 hover:bg-gray-500 py-3 rounded-lg font-medium transition"> ↺ RESET </button>
+        </div>
+       </form>
+      </div>
+     </div>
+    </div><!-- Management Tab -->
+    <div id="management-tab" class="tab-content hidden"><!-- Login Panel -->
+     <div id="admin-login" class="max-w-md mx-auto">
+      <div class="bg-gray-800 rounded-xl p-6 card-shadow border border-gray-700">
+       <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-emerald-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+         <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+         </svg>
+        </div>
+        <h2 class="text-lg font-bold text-white">ADMIN LOGIN</h2>
+        <p class="text-xs text-gray-400 mt-1">MASUKKAN PASSWORD UNTUK AKSES MANAJEMEN</p>
+       </div>
+       <div class="space-y-4">
+        <div><label class="block text-xs text-gray-400 mb-1">PASSWORD</label> <input type="password" id="admin-password" placeholder="••••••••" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500 placeholder-gray-500">
+        </div><button id="admin-login-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 py-3 rounded-lg font-medium transition"> 🔓 LOGIN </button>
+       </div>
+      </div>
+     </div><!-- Admin Panel -->
+     <div id="admin-panel" class="hidden">
+      <div class="flex justify-between items-center mb-6">
+       <h2 class="text-lg font-bold text-emerald-400">⚙️ BRFT MANAGEMENT</h2><button id="admin-logout" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2"> 🚪 LOGOUT </button>
+      </div><!-- Sub-tabs -->
+      <div class="bg-gray-800 rounded-t-xl border border-gray-700 border-b-0">
+       <div class="flex overflow-x-auto"><button class="mgmt-tab mgmt-tab-active px-4 py-3 text-sm font-medium border-b-2 border-emerald-500 text-emerald-400" data-mgmt="operators">👤 OPERATOR</button> <button class="mgmt-tab px-4 py-3 text-sm font-medium text-gray-400 hover:text-emerald-400" data-mgmt="products">📦 KODE PRODUK</button> <button class="mgmt-tab px-4 py-3 text-sm font-medium text-gray-400 hover:text-emerald-400" data-mgmt="areas">🏭 AREA</button> <button class="mgmt-tab px-4 py-3 text-sm font-medium text-gray-400 hover:text-emerald-400" data-mgmt="categories">🏷��� KATEGORI</button> <button class="mgmt-tab px-4 py-3 text-sm font-medium text-gray-400 hover:text-emerald-400" data-mgmt="targets">🎯 TARGET</button> <button class="mgmt-tab px-4 py-3 text-sm font-medium text-gray-400 hover:text-emerald-400" data-mgmt="findings">📋 TEMUAN</button>
+       </div>
+      </div>
+      <div class="bg-gray-800 rounded-b-xl p-5 border border-gray-700 border-t-0"><!-- Operators Management -->
+       <div id="mgmt-operators" class="mgmt-content">
+        <div class="flex gap-3 mb-4"><input type="text" id="new-operator" placeholder="INISIAL OPERATOR BARU" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 placeholder-gray-500"> <button id="add-operator" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition">➕ TAMBAH</button>
+        </div>
+        <div id="operators-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
+       </div><!-- Products Management -->
+       <div id="mgmt-products" class="mgmt-content hidden">
+        <div class="flex gap-3 mb-4"><input type="text" id="new-product" placeholder="KODE PRODUK BARU" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 placeholder-gray-500"> <button id="add-product" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition">➕ TAMBAH</button>
+        </div>
+        <div id="products-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
+       </div><!-- Areas Management -->
+       <div id="mgmt-areas" class="mgmt-content hidden">
+        <div class="flex gap-3 mb-4"><input type="text" id="new-area" placeholder="NAMA AREA BARU" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 placeholder-gray-500"> <button id="add-area" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition">➕ TAMBAH</button>
+        </div>
+        <div id="areas-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
+       </div><!-- Categories Management -->
+       <div id="mgmt-categories" class="mgmt-content hidden">
+        <div class="flex gap-3 mb-4"><input type="text" id="new-category" placeholder="NAMA KATEGORI BARU" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 placeholder-gray-500"> <button id="add-category" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition">➕ TAMBAH</button>
+        </div>
+        <div id="categories-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
+       </div><!-- Targets Management -->
+       <div id="mgmt-targets" class="mgmt-content hidden">
+        <div class="flex gap-3 mb-4"><input type="month" id="new-target-month" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <input type="number" id="new-target-value" placeholder="TARGET DOKUMEN" min="1" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 placeholder-gray-500"> <button id="add-target" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition">➕ TAMBAH</button>
+        </div>
+        <div id="targets-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
+       </div><!-- Findings Management -->
+       <div id="mgmt-findings" class="mgmt-content hidden">
+        <div class="overflow-x-auto max-h-96">
+         <table class="w-full text-sm">
+          <thead class="sticky top-0 bg-gray-800">
+           <tr class="border-b border-gray-700">
+            <th class="text-left py-2 px-2 text-gray-400 font-medium">TANGGAL</th>
+            <th class="text-left py-2 px-2 text-gray-400 font-medium">AREA</th>
+            <th class="text-left py-2 px-2 text-gray-400 font-medium">BATCH</th>
+            <th class="text-left py-2 px-2 text-gray-400 font-medium">AKSI</th>
+           </tr>
+          </thead>
+          <tbody id="findings-mgmt-list" class="divide-y divide-gray-700"></tbody>
+         </table>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div><!-- Audit Trail Tab -->
+    <div id="audit-tab" class="tab-content hidden">
+     <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700 mb-6">
+      <div class="flex flex-wrap gap-3 items-end">
+       <div class="flex-1 min-w-[150px]"><label class="block text-xs text-gray-400 mb-1">DARI TANGGAL</label> <input type="date" id="audit-date-from" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500">
+       </div>
+       <div class="flex-1 min-w-[150px]"><label class="block text-xs text-gray-400 mb-1">SAMPAI TANGGAL</label> <input type="date" id="audit-date-to" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500">
+       </div>
+       <div class="flex-1 min-w-[120px]"><label class="block text-xs text-gray-400 mb-1">AREA</label> <select id="audit-filter-area" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <option value="">SEMUA</option> </select>
+       </div>
+       <div class="flex-1 min-w-[120px]"><label class="block text-xs text-gray-400 mb-1">PRODUK</label> <select id="audit-filter-product" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <option value="">SEMUA</option> </select>
+       </div>
+       <div class="flex-1 min-w-[120px]"><label class="block text-xs text-gray-400 mb-1">KATEGORI</label> <select id="audit-filter-category" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <option value="">SEMUA</option> </select>
+       </div>
+       <div class="flex-1 min-w-[120px]"><label class="block text-xs text-gray-400 mb-1">INISIAL</label> <select id="audit-filter-initial" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <option value="">SEMUA</option> </select>
+       </div><button id="audit-filter-btn" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition">🔍 FILTER</button> <button id="audit-reset-btn" class="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded-lg text-sm font-medium transition">↺ RESET</button> <button id="export-pdf" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition">📄 EXPORT PDF</button>
+      </div>
+     </div>
+     <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
+      <h3 class="text-sm font-semibold text-gray-300 mb-4">📋 AUDIT TRAIL LOG</h3>
+      <div class="overflow-x-auto max-h-96">
+       <table class="w-full text-sm">
+        <thead class="sticky top-0 bg-gray-800">
+         <tr class="border-b border-gray-700">
+          <th class="text-left py-3 px-3 text-gray-400 font-medium">TIMESTAMP</th>
+          <th class="text-left py-3 px-3 text-gray-400 font-medium">AKSI</th>
+          <th class="text-left py-3 px-3 text-gray-400 font-medium">DETAIL</th>
+         </tr>
+        </thead>
+        <tbody id="audit-table" class="divide-y divide-gray-700">
+         <tr>
+          <td colspan="3" class="py-8 text-center text-gray-500">TIDAK ADA LOG</td>
+         </tr>
+        </tbody>
+       </table>
+      </div>
+     </div>
+    </div>
+   </main>
+  </div><!-- Toast Container -->
+  <div id="toast-container"></div><!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+   <div class="bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 border border-gray-700">
+    <h3 class="text-lg font-bold text-white mb-2">⚠️ KONFIRMASI HAPUS</h3>
+    <p id="delete-message" class="text-gray-400 mb-6">APAKAH ANDA YAKIN INGIN MENGHAPUS DATA INI?</p>
+    <div class="flex gap-3"><button id="confirm-delete" class="flex-1 bg-red-600 hover:bg-red-700 py-2 rounded-lg font-medium transition">🗑️ HAPUS</button> <button id="cancel-delete" class="flex-1 bg-gray-600 hover:bg-gray-500 py-2 rounded-lg font-medium transition">❌ BATAL</button>
+    </div>
+   </div>
+  </div><!-- Edit Modal -->
+  <div id="edit-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+   <div class="bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 border border-gray-700">
+    <h3 class="text-lg font-bold text-white mb-4">✏️ EDIT DATA</h3>
+    <div class="mb-4"><label class="block text-xs text-gray-400 mb-1">NILAI BARU</label> <input type="text" id="edit-value" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500">
+    </div>
+    <div class="flex gap-3"><button id="confirm-edit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 py-2 rounded-lg font-medium transition">💾 SIMPAN</button> <button id="cancel-edit" class="flex-1 bg-gray-600 hover:bg-gray-500 py-2 rounded-lg font-medium transition">❌ BATAL</button>
+    </div>
+   </div>
+  </div>
+  <script>
+    // Supabase Configuration
+    const SUPABASE_URL = 'https://aetnuvotehpbfykakuni.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFldG51dm90ZWhwYmZ5a2FrdW5pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwNTU0OTgsImV4cCI6MjA4NDYzMTQ5OH0.VurModFLejJ-f68RqwpydgrrvCJ84zoNftugg-8SS9k';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Default Config
+    const defaultConfig = {
+      app_title: 'BRFT MONITORING SYSTEM',
+      company_name: 'PHARMA QUALITY CONTROL',
+      primary_color: '#10b981',
+      background_color: '#111827',
+      surface_color: '#1f2937',
+      text_color: '#f3f4f6',
+      accent_color: '#059669'
+    };
+
+    // Application State
+    let findings = [];
+    let operators = [];
+    let products = [];
+    let areas = [];
+    let categories = [];
+    let targets = [];
+    let auditLogs = [];
+    let isAdminLoggedIn = false;
+    let deleteCallback = null;
+    let editCallback = null;
+    let charts = {};
+
+    // Supabase Real-time Subscriptions
+    let subscriptions = [];
+
+    // Initialize Element SDK
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (config) => {
+          document.getElementById('app-title').textContent = config.app_title || defaultConfig.app_title;
+          document.getElementById('company-name').textContent = config.company_name || defaultConfig.company_name;
+        },
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.primary_color || defaultConfig.primary_color,
+              set: (v) => { config.primary_color = v; window.elementSdk.setConfig({ primary_color: v }); }
+            }
+          ],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ['app_title', config.app_title || defaultConfig.app_title],
+          ['company_name', config.company_name || defaultConfig.company_name]
+        ])
+      });
+    }
+
+    // Supabase Data Loading Functions
+    async function loadAllData() {
+      try {
+        // Load all master data in parallel
+        const [operatorsRes, productsRes, areasRes, categoriesRes, targetsRes, findingsRes, auditRes] = await Promise.all([
+          supabaseClient.from('operators').select('*').order('name'),
+          supabaseClient.from('products').select('*').order('name'),
+          supabaseClient.from('areas').select('*').order('name'),
+          supabaseClient.from('categories').select('*').order('name'),
+          supabaseClient.from('targets').select('*').order('target_month', { ascending: false }),
+          supabaseClient.from('findings_detailed').select('*').order('date', { ascending: false }),
+          supabaseClient.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(500)
+        ]);
+
+        if (operatorsRes.error) throw operatorsRes.error;
+        if (productsRes.error) throw productsRes.error;
+        if (areasRes.error) throw areasRes.error;
+        if (categoriesRes.error) throw categoriesRes.error;
+        if (targetsRes.error) throw targetsRes.error;
+        if (findingsRes.error) throw findingsRes.error;
+        if (auditRes.error) throw auditRes.error;
+
+        operators = operatorsRes.data || [];
+        products = productsRes.data || [];
+        areas = areasRes.data || [];
+        categories = categoriesRes.data || [];
+        targets = targetsRes.data || [];
+        findings = findingsRes.data || [];
+        auditLogs = auditRes.data || [];
+
+        updateDropdowns();
+        updateDashboard();
+        updateManagementLists();
+        updateAuditTable();
+      } catch (error) {
+        console.error('Error loading data:', error);
+        showToast('GAGAL MEMUAT DATA', 'error');
+      }
+    }
+
+    // Setup Real-time Subscriptions
+    function setupRealtimeSubscriptions() {
+      // Subscribe to all tables
+      const tables = ['operators', 'products', 'areas', 'categories', 'targets', 'findings', 'audit_logs'];
+      
+      tables.forEach(table => {
+        const subscription = supabaseClient
+          .channel(`${table}_changes`)
+          .on('postgres_changes', { event: '*', schema: 'public', table: table }, () => {
+            loadAllData();
+          })
+          .subscribe();
+        
+        subscriptions.push(subscription);
+      });
+    }
+
+    // Toast Notification
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600'} text-white`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Add Audit Log
+    async function addAuditLog(action, details, area = '', product = '', category = '', initial = '') {
+      try {
+        const { error } = await supabaseClient.from('audit_logs').insert({
+          action: action,
+          details: details,
+          area: area || null,
+          product: product || null,
+          category: category || null,
+          operator_initial: initial || null
+        });
+        
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error adding audit log:', error);
+      }
+    }
+
+    // Tab Navigation
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Auto-lock management tab when switching away
+        if (btn.dataset.tab !== 'management' && isAdminLoggedIn) {
+          isAdminLoggedIn = false;
+          document.getElementById('admin-panel').classList.add('hidden');
+          document.getElementById('admin-login').classList.remove('hidden');
+          document.getElementById('admin-password').value = '';
+        }
+
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active', 'text-emerald-400'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.add('text-gray-400'));
+        btn.classList.add('tab-active', 'text-emerald-400');
+        btn.classList.remove('text-gray-400');
+
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        document.getElementById(`${btn.dataset.tab}-tab`).classList.remove('hidden');
+      });
+    });
+
+    // Management Sub-tabs
+    document.querySelectorAll('.mgmt-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.mgmt-tab').forEach(t => {
+          t.classList.remove('mgmt-tab-active', 'border-emerald-500', 'text-emerald-400', 'border-b-2');
+          t.classList.add('text-gray-400');
+        });
+        tab.classList.add('mgmt-tab-active', 'border-emerald-500', 'text-emerald-400', 'border-b-2');
+        tab.classList.remove('text-gray-400');
+
+        document.querySelectorAll('.mgmt-content').forEach(c => c.classList.add('hidden'));
+        document.getElementById(`mgmt-${tab.dataset.mgmt}`).classList.remove('hidden');
+      });
+    });
+
+    // Update Dropdowns
+    function updateDropdowns() {
+      const areaOptions = '<option value="">PILIH AREA</option>' + areas.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+      const categoryOptions = '<option value="">PILIH KATEGORI</option>' + categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      const productOptions = '<option value="">PILIH PRODUK</option>' + products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+      const operatorOptions = '<option value="">PILIH OPERATOR</option>' + operators.map(o => `<option value="${o.id}">${o.name}</option>`).join('');
+
+      document.getElementById('input-area').innerHTML = areaOptions;
+      document.getElementById('input-category').innerHTML = categoryOptions;
+      document.getElementById('input-product').innerHTML = productOptions;
+      document.getElementById('input-operator').innerHTML = operatorOptions;
+
+      // Filter dropdowns
+      document.getElementById('filter-area').innerHTML = '<option value="">SEMUA AREA</option>' + areas.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
+      document.getElementById('filter-product').innerHTML = '<option value="">SEMUA PRODUK</option>' + products.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+      document.getElementById('filter-category').innerHTML = '<option value="">SEMUA KATEGORI</option>' + categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+      document.getElementById('filter-operator').innerHTML = '<option value="">SEMUA OPERATOR</option>' + operators.map(o => `<option value="${o.name}">${o.name}</option>`).join('');
+
+      // Audit filter dropdowns
+      document.getElementById('audit-filter-area').innerHTML = '<option value="">SEMUA</option>' + areas.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
+      document.getElementById('audit-filter-product').innerHTML = '<option value="">SEMUA</option>' + products.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+      document.getElementById('audit-filter-category').innerHTML = '<option value="">SEMUA</option>' + categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+      document.getElementById('audit-filter-initial').innerHTML = '<option value="">SEMUA</option>' + operators.map(o => `<option value="${o.name}">${o.name}</option>`).join('');
+    }
+
+    // Calculate BRFT Percentage
+    function calculateBRFT(month, targetValue, findingsCount) {
+      if (!targetValue || targetValue <= 0) return null;
+      return ((targetValue - findingsCount) / targetValue) * 100;
+    }
+
+    // Update Dashboard
+    function updateDashboard() {
+      const now = new Date();
+      const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+      // Apply filters
+      let filteredFindings = [...findings];
+      const dateFrom = document.getElementById('filter-date-from').value;
+      const dateTo = document.getElementById('filter-date-to').value;
+      const filterArea = document.getElementById('filter-area').value;
+      const filterProduct = document.getElementById('filter-product').value;
+      const filterCategory = document.getElementById('filter-category').value;
+      const filterOperator = document.getElementById('filter-operator').value;
+
+      if (dateFrom) filteredFindings = filteredFindings.filter(f => f.date >= dateFrom);
+      if (dateTo) filteredFindings = filteredFindings.filter(f => f.date <= dateTo);
+      if (filterArea) filteredFindings = filteredFindings.filter(f => f.area_name === filterArea);
+      if (filterProduct) filteredFindings = filteredFindings.filter(f => f.product_name === filterProduct);
+      if (filterCategory) filteredFindings = filteredFindings.filter(f => f.category_name === filterCategory);
+      if (filterOperator) filteredFindings = filteredFindings.filter(f => f.operator_name === filterOperator);
+
+      // Summary cards - show filtered total
+      document.getElementById('total-findings').textContent = filteredFindings.length;
+
+      // Determine which months are covered by the filter
+      let targetValue = 0;
+      let monthFindings = 0;
+      let isValidForBRFT = false;
+      let coveredMonths = [];
+
+      if (dateFrom && dateTo) {
+        const fromDate = new Date(dateFrom);
+        const toDate = new Date(dateTo);
+        
+        // Generate list of all months covered by the filter
+        let currentDate = new Date(fromDate.getFullYear(), fromDate.getMonth(), 1);
+        while (currentDate <= toDate) {
+          const monthKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+          const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+          const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+          
+          // Format dates as YYYY-MM-DD strings for comparison
+          const firstDayStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-01`;
+          const lastDayStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(lastDayOfMonth.getDate()).padStart(2, '0')}`;
+          
+          // Check if filter range covers entire month (from <= first day AND to >= last day)
+          const isFullMonth = dateFrom <= firstDayStr && dateTo >= lastDayStr;
+          
+          if (isFullMonth && !coveredMonths.includes(monthKey)) {
+            coveredMonths.push(monthKey);
+          }
+          
+          // Move to next month
+          currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+        }
+        
+        // If we have at least one full month covered, calculate totals
+        if (coveredMonths.length > 0) {
+          isValidForBRFT = true;
+          monthFindings = filteredFindings.length;
+          
+          // Sum up targets for all covered months
+          coveredMonths.forEach(month => {
+            const monthTarget = targets.find(t => t.target_month === month);
+            if (monthTarget) {
+              targetValue += monthTarget.target_value;
+            }
+          });
+        }
+      } else if (!dateFrom && !dateTo) {
+        // No filter - use current month
+        isValidForBRFT = true;
+        monthFindings = filteredFindings.length;
+        const monthTarget = targets.find(t => t.target_month === currentMonth);
+        targetValue = monthTarget ? monthTarget.target_value : 0;
+      }
+
+      document.getElementById('target-docs').textContent = isValidForBRFT ? targetValue : '-';
+
+      const brftPercent = isValidForBRFT && targetValue > 0 ? ((targetValue - monthFindings) / targetValue) * 100 : null;
+      const brftEl = document.getElementById('brft-percentage');
+      const indicatorEl = document.getElementById('brft-indicator');
+
+      if (brftPercent !== null) {
+        brftEl.textContent = brftPercent.toFixed(1) + '%';
+        if (brftPercent >= 100) {
+          brftEl.className = 'text-3xl font-bold text-emerald-400';
+          indicatorEl.className = 'w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center';
+        } else {
+          brftEl.className = 'text-3xl font-bold text-red-400';
+          indicatorEl.className = 'w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center';
+        }
+      } else {
+        brftEl.textContent = '-';
+        brftEl.className = 'text-3xl font-bold text-gray-400';
+        indicatorEl.className = 'w-12 h-12 bg-gray-500/20 rounded-xl flex items-center justify-center';
+      }
+
+      // Update charts
+      updateCharts(filteredFindings);
+
+      // Update table
+      updateFindingsTable(filteredFindings);
+    }
+
+    // Update Charts
+    function updateCharts(filteredFindings) {
+      const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { 
+          legend: { display: false },
+          datalabels: {
+            anchor: 'center',
+            align: 'center',
+            color: '#ffffff',
+            font: { size: 14, weight: 'bold' },
+            formatter: (value) => value > 0 ? value : ''
+          }
+        },
+        scales: {
+          x: { grid: { color: '#374151' }, ticks: { color: '#9ca3af', font: { size: 10 } } },
+          y: { grid: { color: '#374151' }, ticks: { color: '#9ca3af', font: { size: 10 } } }
+        }
+      };
+
+      // Monthly trend data
+      const monthlyData = {};
+      filteredFindings.forEach(f => {
+        if (f.date) {
+          const month = f.date.substring(0, 7);
+          monthlyData[month] = (monthlyData[month] || 0) + 1;
+        }
+      });
+
+      const months = Object.keys(monthlyData).sort();
+      
+      // Format months as MMM YYYY (e.g., JAN 2026)
+      const monthLabels = months.map(m => {
+        const [year, month] = m.split('-');
+        const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+        return `${monthNames[parseInt(month) - 1]} ${year}`;
+      });
+
+      const brftTrend = months.map(m => {
+        const target = targets.find(t => t.target_month === m);
+        if (target) {
+          const pct = calculateBRFT(m, target.target_value, monthlyData[m]);
+          return pct !== null ? pct : 0;
+        }
+        return 0;
+      });
+
+      // Chart 1: BRFT Trend
+      if (charts.trend) charts.trend.destroy();
+      charts.trend = new Chart(document.getElementById('chart-trend'), {
+        type: 'line',
+        data: {
+          labels: monthLabels,
+          datasets: [{
+            data: brftTrend,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: { 
+          ...chartOptions, 
+          scales: { 
+            ...chartOptions.scales, 
+            y: { ...chartOptions.scales.y, min: 0, max: 100 } 
+          },
+          plugins: {
+            ...chartOptions.plugins,
+            datalabels: {
+              ...chartOptions.plugins.datalabels,
+              formatter: (value) => value > 0 ? value.toFixed(1) + '%' : ''
+            }
+          }
+        },
+        plugins: [ChartDataLabels]
+      });
+
+      // Chart 2: Monthly Findings
+      if (charts.monthly) charts.monthly.destroy();
+      charts.monthly = new Chart(document.getElementById('chart-monthly'), {
+        type: 'bar',
+        data: {
+          labels: monthLabels,
+          datasets: [{ data: months.map(m => monthlyData[m]), backgroundColor: '#f59e0b' }]
+        },
+        options: chartOptions,
+        plugins: [ChartDataLabels]
+      });
+
+      // Chart 3: By Area
+      const areaData = {};
+      filteredFindings.forEach(f => { if (f.area) areaData[f.area] = (areaData[f.area] || 0) + 1; });
+      if (charts.area) charts.area.destroy();
+      charts.area = new Chart(document.getElementById('chart-area'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(areaData),
+          datasets: [{ data: Object.values(areaData), backgroundColor: '#3b82f6' }]
+        },
+        options: chartOptions,
+        plugins: [ChartDataLabels]
+      });
+
+      // Chart 4: By Product
+      const productData = {};
+      filteredFindings.forEach(f => { if (f.product_code) productData[f.product_code] = (productData[f.product_code] || 0) + 1; });
+      if (charts.product) charts.product.destroy();
+      charts.product = new Chart(document.getElementById('chart-product'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(productData),
+          datasets: [{ data: Object.values(productData), backgroundColor: '#8b5cf6' }]
+        },
+        options: chartOptions,
+        plugins: [ChartDataLabels]
+      });
+
+      // Chart 5: By Operator
+      const operatorData = {};
+      filteredFindings.forEach(f => { if (f.operator_initial) operatorData[f.operator_initial] = (operatorData[f.operator_initial] || 0) + 1; });
+      if (charts.operator) charts.operator.destroy();
+      charts.operator = new Chart(document.getElementById('chart-operator'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(operatorData),
+          datasets: [{ data: Object.values(operatorData), backgroundColor: '#ec4899' }]
+        },
+        options: chartOptions,
+        plugins: [ChartDataLabels]
+      });
+
+      // Chart 6: By Category
+      const categoryData = {};
+      filteredFindings.forEach(f => { if (f.category) categoryData[f.category] = (categoryData[f.category] || 0) + 1; });
+      if (charts.category) charts.category.destroy();
+      charts.category = new Chart(document.getElementById('chart-category'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(categoryData),
+          datasets: [{ data: Object.values(categoryData), backgroundColor: '#14b8a6' }]
+        },
+        options: chartOptions,
+        plugins: [ChartDataLabels]
+      });
+    }
+
+    // Update Findings Table
+    function updateFindingsTable(filteredFindings) {
+      const tbody = document.getElementById('findings-table');
+      if (filteredFindings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-gray-500">TIDAK ADA DATA</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filteredFindings.sort((a, b) => new Date(b.date) - new Date(a.date)).map(f => {
+        // Format date as dd MMM YYYY (e.g., 22 JAN 2026)
+        let formattedDate = '-';
+        if (f.date) {
+          const [year, month, day] = f.date.split('-');
+          const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+          formattedDate = `${day} ${monthNames[parseInt(month) - 1]} ${year}`;
+        }
+
+        return `
+          <tr class="hover:bg-gray-700/50">
+            <td class="py-3 px-3 text-gray-300">${formattedDate}</td>
+            <td class="py-3 px-3 text-gray-300">${f.operator_initial || '-'}</td>
+            <td class="py-3 px-3 text-gray-300">${f.area || '-'}</td>
+            <td class="py-3 px-3"><span class="px-2 py-1 bg-amber-500/20 text-amber-400 rounded text-xs">${f.category || '-'}</span></td>
+            <td class="py-3 px-3 text-gray-300">${f.batch_number || '-'}</td>
+            <td class="py-3 px-3 text-gray-300 max-w-xs truncate">${f.description || '-'}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Update Management Lists
+    function updateManagementLists() {
+      // Operators
+      document.getElementById('operators-list').innerHTML = operators.length === 0
+        ? '<p class="text-gray-500 text-center py-4">TIDAK ADA DATA</p>'
+        : operators.map(o => createMasterItem(o, 'operator')).join('');
+
+      // Products
+      document.getElementById('products-list').innerHTML = products.length === 0
+        ? '<p class="text-gray-500 text-center py-4">TIDAK ADA DATA</p>'
+        : products.map(p => createMasterItem(p, 'product')).join('');
+
+      // Areas
+      document.getElementById('areas-list').innerHTML = areas.length === 0
+        ? '<p class="text-gray-500 text-center py-4">TIDAK ADA DATA</p>'
+        : areas.map(a => createMasterItem(a, 'area')).join('');
+
+      // Categories
+      document.getElementById('categories-list').innerHTML = categories.length === 0
+        ? '<p class="text-gray-500 text-center py-4">TIDAK ADA DATA</p>'
+        : categories.map(c => createMasterItem(c, 'category')).join('');
+
+      // Targets
+      document.getElementById('targets-list').innerHTML = targets.length === 0
+        ? '<p class="text-gray-500 text-center py-4">TIDAK ADA DATA</p>'
+        : targets.sort((a, b) => b.target_month.localeCompare(a.target_month)).map(t => {
+            const monthFindings = findings.filter(f => f.date && f.date.startsWith(t.target_month)).length;
+            const brft = calculateBRFT(t.target_month, t.target_value, monthFindings);
+            return `
+              <div class="flex items-center justify-between bg-gray-700 rounded-lg px-4 py-3" data-id="${t.__backendId}">
+                <div class="flex-1">
+                  <span class="font-medium">${t.target_month}</span>
+                  <span class="text-gray-400 ml-2">TARGET: ${t.target_value}</span>
+                  <span class="text-gray-400 ml-2">TEMUAN: ${monthFindings}</span>
+                  <span class="ml-2 ${brft >= 95 ? 'text-emerald-400' : brft >= 90 ? 'text-amber-400' : 'text-red-400'}">${brft !== null ? brft.toFixed(1) + '%' : '-'}</span>
+                </div>
+                <div class="flex gap-2">
+                  <button class="edit-target text-blue-400 hover:text-blue-300 p-1" data-id="${t.__backendId}">✏️</button>
+                  <button class="delete-target text-red-400 hover:text-red-300 p-1" data-id="${t.__backendId}">🗑️</button>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+      // Findings Management
+      document.getElementById('findings-mgmt-list').innerHTML = findings.length === 0
+        ? '<tr><td colspan="4" class="py-8 text-center text-gray-500">TIDAK ADA DATA</td></tr>'
+        : findings.sort((a, b) => new Date(b.date) - new Date(a.date)).map(f => `
+            <tr class="hover:bg-gray-700/50" data-id="${f.__backendId}">
+              <td class="py-2 px-2 text-gray-300">${f.date || '-'}</td>
+              <td class="py-2 px-2 text-gray-300">${f.area || '-'}</td>
+              <td class="py-2 px-2 text-gray-300">${f.batch_number || '-'}</td>
+              <td class="py-2 px-2">
+                <button class="delete-finding text-red-400 hover:text-red-300" data-id="${f.__backendId}">🗑️</button>
+              </td>
+            </tr>
+          `).join('');
+
+      // Add event listeners
+      addManagementEventListeners();
+    }
+
+    function createMasterItem(item, type) {
+      return `
+        <div class="flex items-center justify-between bg-gray-700 rounded-lg px-4 py-3" data-id="${item.__backendId}">
+          <span class="font-medium">${item.name}</span>
+          <div class="flex gap-2">
+            <button class="edit-${type} text-blue-400 hover:text-blue-300 p-1" data-id="${item.__backendId}">✏️</button>
+            <button class="delete-${type} text-red-400 hover:text-red-300 p-1" data-id="${item.__backendId}">🗑️</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function addManagementEventListeners() {
+      ['operator', 'product', 'area', 'category'].forEach(type => {
+        document.querySelectorAll(`.edit-${type}`).forEach(btn => {
+          btn.addEventListener('click', () => openEditModal(type, btn.dataset.id));
+        });
+        document.querySelectorAll(`.delete-${type}`).forEach(btn => {
+          btn.addEventListener('click', () => openDeleteModal(type, btn.dataset.id));
+        });
+      });
+
+      document.querySelectorAll('.edit-target').forEach(btn => {
+        btn.addEventListener('click', () => openEditTargetModal(btn.dataset.id));
+      });
+      document.querySelectorAll('.delete-target').forEach(btn => {
+        btn.addEventListener('click', () => openDeleteModal('target', btn.dataset.id));
+      });
+      document.querySelectorAll('.delete-finding').forEach(btn => {
+        btn.addEventListener('click', () => openDeleteModal('finding', btn.dataset.id));
+      });
+    }
+
+    // Update Audit Table
+    function updateAuditTable(filteredLogs = null) {
+      const logs = filteredLogs || auditLogs;
+      const tbody = document.getElementById('audit-table');
+
+      if (logs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="py-8 text-center text-gray-500">TIDAK ADA LOG</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = logs.map(log => {
+        const actionColor = log.audit_action === 'CREATE' ? 'text-emerald-400' :
+                           log.audit_action === 'UPDATE' ? 'text-blue-400' :
+                           log.audit_action === 'DELETE' ? 'text-red-400' : 'text-amber-400';
+        return `
+          <tr class="hover:bg-gray-700/50">
+            <td class="py-3 px-3 text-gray-300 text-xs">${new Date(log.audit_timestamp).toLocaleString('ID-id')}</td>
+            <td class="py-3 px-3"><span class="px-2 py-1 rounded text-xs font-medium ${actionColor}">${log.audit_action}</span></td>
+            <td class="py-3 px-3 text-gray-300 text-xs">${log.audit_details}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Modal Functions
+    function openDeleteModal(type, id) {
+      document.getElementById('delete-modal').classList.remove('hidden');
+      deleteCallback = async () => {
+        const item = allData.find(d => d.__backendId === id);
+        if (item) {
+          const result = await window.dataSdk.delete(item);
+          if (result.isOk) {
+            await addAuditLog('DELETE', `DELETED ${type.toUpperCase()}: ${item.name || item.target_month || item.batch_number || id}`);
+            showToast('DATA BERHASIL DIHAPUS', 'success');
+          } else {
+            showToast('GAGAL MENGHAPUS DATA', 'error');
+          }
+        }
+        document.getElementById('delete-modal').classList.add('hidden');
+      };
+    }
+
+    function openEditModal(type, id) {
+      const item = allData.find(d => d.__backendId === id);
+      if (!item) return;
+
+      document.getElementById('edit-value').value = item.name || '';
+      document.getElementById('edit-modal').classList.remove('hidden');
+
+      editCallback = async () => {
+        const newValue = document.getElementById('edit-value').value.trim().toUpperCase();
+        if (!newValue) {
+          showToast('NILAI TIDAK BOLEH KOSONG', 'error');
+          return;
+        }
+
+        const oldValue = item.name;
+        item.name = newValue;
+        const result = await window.dataSdk.update(item);
+        if (result.isOk) {
+          await addAuditLog('UPDATE', `UPDATED ${type.toUpperCase()}: ${oldValue} → ${newValue}`);
+          showToast('DATA BERHASIL DIUPDATE', 'success');
+        } else {
+          showToast('GAGAL UPDATE DATA', 'error');
+        }
+        document.getElementById('edit-modal').classList.add('hidden');
+      };
+    }
+
+    function openEditTargetModal(id) {
+      const target = targets.find(t => t.__backendId === id);
+      if (!target) return;
+
+      document.getElementById('edit-value').value = target.target_value || '';
+      document.getElementById('edit-modal').classList.remove('hidden');
+
+      editCallback = async () => {
+        const newValue = parseInt(document.getElementById('edit-value').value);
+        if (isNaN(newValue) || newValue <= 0) {
+          showToast('NILAI TARGET TIDAK VALID', 'error');
+          return;
+        }
+
+        const oldValue = target.target_value;
+        target.target_value = newValue;
+        const result = await window.dataSdk.update(target);
+        if (result.isOk) {
+          await addAuditLog('UPDATE', `UPDATED TARGET ${target.target_month}: ${oldValue} → ${newValue}`);
+          showToast('TARGET BERHASIL DIUPDATE', 'success');
+        } else {
+          showToast('GAGAL UPDATE TARGET', 'error');
+        }
+        document.getElementById('edit-modal').classList.add('hidden');
+      };
+    }
+
+    // Modal Event Listeners
+    document.getElementById('confirm-delete').addEventListener('click', () => {
+      if (deleteCallback) deleteCallback();
+    });
+    document.getElementById('cancel-delete').addEventListener('click', () => {
+      document.getElementById('delete-modal').classList.add('hidden');
+    });
+    document.getElementById('confirm-edit').addEventListener('click', () => {
+      if (editCallback) editCallback();
+    });
+    document.getElementById('cancel-edit').addEventListener('click', () => {
+      document.getElementById('edit-modal').classList.add('hidden');
+    });
+
+    // Finding Form Submit
+    document.getElementById('finding-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (allData.length >= 999) {
+        showToast('BATAS MAKSIMAL 999 RECORD TERCAPAI', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('submit-finding');
+      btn.disabled = true;
+      btn.innerHTML = '⏳ MENYIMPAN...';
+
+      const data = {
+        record_type: 'finding',
+        date: document.getElementById('input-date').value,
+        area: document.getElementById('input-area').value,
+        category: document.getElementById('input-category').value,
+        product_code: document.getElementById('input-product').value,
+        batch_number: document.getElementById('input-batch').value.toUpperCase(),
+        operator_initial: document.getElementById('input-operator').value,
+        description: document.getElementById('input-description').value.toUpperCase(),
+        created_at: new Date().toISOString()
+      };
+
+      const result = await window.dataSdk.create(data);
+      if (result.isOk) {
+        await addAuditLog('CREATE', `NEW FINDING: BATCH ${data.batch_number}, AREA ${data.area}`, data.area, data.product_code, data.category, data.operator_initial);
+        showToast('TEMUAN BERHASIL DISIMPAN', 'success');
+        document.getElementById('finding-form').reset();
+      } else {
+        showToast('GAGAL MENYIMPAN TEMUAN', 'error');
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<span>💾</span> SIMPAN TEMUAN';
+    });
+
+    // Admin Login
+    document.getElementById('admin-login-btn').addEventListener('click', () => {
+      const password = document.getElementById('admin-password').value;
+      if (password === 'admin123') {
+        isAdminLoggedIn = true;
+        document.getElementById('admin-login').classList.add('hidden');
+        document.getElementById('admin-panel').classList.remove('hidden');
+        addAuditLog('LOGIN', 'ADMIN LOGIN SUCCESSFUL');
+        showToast('LOGIN BERHASIL', 'success');
+      } else {
+        showToast('PASSWORD SALAH', 'error');
+      }
+    });
+
+    document.getElementById('admin-logout').addEventListener('click', () => {
+      isAdminLoggedIn = false;
+      document.getElementById('admin-panel').classList.add('hidden');
+      document.getElementById('admin-login').classList.remove('hidden');
+      document.getElementById('admin-password').value = '';
+      addAuditLog('LOGOUT', 'ADMIN LOGOUT');
+      showToast('LOGOUT BERHASIL', 'info');
+    });
+
+    // Add Master Data
+    async function addMasterData(type, inputId, recordType) {
+      if (allData.length >= 999) {
+        showToast('BATAS MAKSIMAL 999 RECORD TERCAPAI', 'error');
+        return;
+      }
+
+      const input = document.getElementById(inputId);
+      const value = input.value.trim().toUpperCase();
+      if (!value) {
+        showToast('NILAI TIDAK BOLEH KOSONG', 'error');
+        return;
+      }
+
+      // Clear input immediately
+      input.value = '';
+
+      const result = await window.dataSdk.create({
+        record_type: recordType,
+        name: value,
+        created_at: new Date().toISOString()
+      });
+
+      if (result.isOk) {
+        await addAuditLog('CREATE', `NEW ${type.toUpperCase()}: ${value}`);
+        showToast(`${type.toUpperCase()} BERHASIL DITAMBAHKAN`, 'success');
+      } else {
+        showToast('GAGAL MENAMBAHKAN DATA', 'error');
+      }
+    }
+
+    document.getElementById('add-operator').addEventListener('click', () => addMasterData('operator', 'new-operator', 'operator'));
+    document.getElementById('add-product').addEventListener('click', () => addMasterData('product', 'new-product', 'product'));
+    document.getElementById('add-area').addEventListener('click', () => addMasterData('area', 'new-area', 'area'));
+    document.getElementById('add-category').addEventListener('click', () => addMasterData('category', 'new-category', 'category'));
+
+    // Add Target
+    document.getElementById('add-target').addEventListener('click', async () => {
+      if (allData.length >= 999) {
+        showToast('BATAS MAKSIMAL 999 RECORD TERCAPAI', 'error');
+        return;
+      }
+
+      const month = document.getElementById('new-target-month').value;
+      const value = parseInt(document.getElementById('new-target-value').value);
+
+      if (!month || isNaN(value) || value <= 0) {
+        showToast('DATA TIDAK VALID', 'error');
+        return;
+      }
+
+      const existingTarget = targets.find(t => t.target_month === month);
+      if (existingTarget) {
+        showToast('TARGET BULAN INI SUDAH ADA', 'error');
+        return;
+      }
+
+      // Clear inputs immediately
+      document.getElementById('new-target-month').value = '';
+      document.getElementById('new-target-value').value = '';
+
+      const result = await window.dataSdk.create({
+        record_type: 'target',
+        target_month: month,
+        target_value: value,
+        created_at: new Date().toISOString()
+      });
+
+      if (result.isOk) {
+        await addAuditLog('CREATE', `NEW TARGET: ${month} = ${value}`);
+        showToast('TARGET BERHASIL DITAMBAHKAN', 'success');
+      } else {
+        showToast('GAGAL MENAMBAHKAN TARGET', 'error');
+      }
+    });
+
+    // Filters
+    document.getElementById('apply-filter').addEventListener('click', updateDashboard);
+    document.getElementById('reset-filter').addEventListener('click', () => {
+      document.getElementById('filter-date-from').value = '';
+      document.getElementById('filter-date-to').value = '';
+      document.getElementById('filter-area').value = '';
+      document.getElementById('filter-product').value = '';
+      document.getElementById('filter-category').value = '';
+      document.getElementById('filter-operator').value = '';
+      updateDashboard();
+    });
+
+    // Audit Filters
+    document.getElementById('audit-filter-btn').addEventListener('click', () => {
+      const dateFrom = document.getElementById('audit-date-from').value;
+      const dateTo = document.getElementById('audit-date-to').value;
+      const area = document.getElementById('audit-filter-area').value;
+      const product = document.getElementById('audit-filter-product').value;
+      const category = document.getElementById('audit-filter-category').value;
+      const initial = document.getElementById('audit-filter-initial').value;
+
+      let filtered = [...auditLogs];
+      if (dateFrom) filtered = filtered.filter(l => l.audit_timestamp >= dateFrom);
+      if (dateTo) filtered = filtered.filter(l => l.audit_timestamp <= dateTo + 'T23:59:59');
+      if (area) filtered = filtered.filter(l => l.audit_area === area);
+      if (product) filtered = filtered.filter(l => l.audit_product === product);
+      if (category) filtered = filtered.filter(l => l.audit_category === category);
+      if (initial) filtered = filtered.filter(l => l.audit_initial === initial);
+
+      updateAuditTable(filtered);
+    });
+
+    document.getElementById('audit-reset-btn').addEventListener('click', () => {
+      document.getElementById('audit-date-from').value = '';
+      document.getElementById('audit-date-to').value = '';
+      document.getElementById('audit-filter-area').value = '';
+      document.getElementById('audit-filter-product').value = '';
+      document.getElementById('audit-filter-category').value = '';
+      document.getElementById('audit-filter-initial').value = '';
+      updateAuditTable();
+    });
+
+    // Export PDF
+    document.getElementById('export-pdf').addEventListener('click', () => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFontSize(16);
+      doc.text('BRFT AUDIT TRAIL REPORT', 105, 20, { align: 'center' });
+      doc.setFontSize(10);
+      doc.text(`GENERATED: ${new Date().toLocaleString('ID-id')}`, 105, 28, { align: 'center' });
+
+      let y = 40;
+      doc.setFontSize(8);
+      doc.text('TIMESTAMP', 15, y);
+      doc.text('ACTION', 70, y);
+      doc.text('DETAILS', 100, y);
+
+      y += 5;
+      doc.line(15, y, 195, y);
+      y += 5;
+
+      auditLogs.slice(0, 50).forEach(log => {
+        if (y > 280) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(new Date(log.audit_timestamp).toLocaleString('ID-id').substring(0, 20), 15, y);
+        doc.text(log.audit_action || '', 70, y);
+        doc.text((log.audit_details || '').substring(0, 60), 100, y);
+        y += 6;
+      });
+
+      doc.save(`BRFT_AUDIT_${new Date().toISOString().split('T')[0]}.pdf`);
+      showToast('PDF BERHASIL DIEXPORT', 'success');
+    });
+
+    // Theme Toggle
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      document.body.classList.toggle('bg-gray-100');
+      document.body.classList.toggle('bg-gray-900');
+      document.body.classList.toggle('text-gray-900');
+      document.body.classList.toggle('text-gray-100');
+    });
+
+    // Set current date
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString('ID-id', { 
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+    }).toUpperCase();
+
+    // Initialize Data SDK
+    async function init() {
+      if (window.dataSdk) {
+        const result = await window.dataSdk.init(dataHandler);
+        if (!result.isOk) {
+          showToast('GAGAL MENGINISIALISASI DATABASE', 'error');
+        }
+      }
+
+      // Auto-fill date filters with current month range
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const firstDay = `${year}-${month}-01`;
+      const lastDay = new Date(year, now.getMonth() + 1, 0).getDate();
+      const lastDayFormatted = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
+
+      document.getElementById('filter-date-from').value = firstDay;
+      document.getElementById('filter-date-to').value = lastDayFormatted;
+    }
+
+    init();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c1dca7a97ecfe86',t:'MTc2OTA3MTY5Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
