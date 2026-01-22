@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BRFT MONITORING SYSTEM PT. GOF</title>
+  <title>BRFT MONITORING SYSTEM</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
@@ -41,8 +41,8 @@
       </svg>
      </div>
      <div>
-      <h1 id="app-title" class="text-xl font-bold text-emerald-400">BRFT MONITORING SYSTEM PT. GOF</h1>
-      <p id="company-name" class="text-xs text-gray-400">CREATED by MSTD</p>
+      <h1 id="app-title" class="text-xl font-bold text-emerald-400">BRFT MONITORING SYSTEM</h1>
+      <p id="company-name" class="text-xs text-gray-400">PHARMA QUALITY CONTROL</p>
      </div>
     </div>
     <div class="flex items-center gap-4"><span id="current-date" class="text-sm text-gray-400"></span> <button id="theme-toggle" class="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition">
@@ -72,7 +72,7 @@
       <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
        <div class="flex items-center justify-between">
         <div>
-         <p class="text-xs text-gray-400 mb-1">TOTAL DOKUMEN</p>
+         <p class="text-xs text-gray-400 mb-1">TARGET DOKUMEN</p>
          <p id="target-docs" class="text-3xl font-bold text-blue-400">0</p>
         </div>
         <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
@@ -84,7 +84,7 @@
       <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
        <div class="flex items-center justify-between">
         <div>
-         <p class="text-xs text-gray-400 mb-1">% BRFT</p>
+         <p class="text-xs text-gray-400 mb-1">% BRFT BULAN INI</p>
          <p id="brft-percentage" class="text-3xl font-bold">-</p>
         </div>
         <div id="brft-indicator" class="w-12 h-12 bg-gray-500/20 rounded-xl flex items-center justify-center">
@@ -245,7 +245,7 @@
         <div id="categories-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
        </div><!-- Targets Management -->
        <div id="mgmt-targets" class="mgmt-content hidden">
-        <div class="flex gap-3 mb-4"><input type="month" id="new-target-month" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <input type="number" id="new-target-value" placeholder="TOTAL DOKUMEN" min="1" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 placeholder-gray-500"> <button id="add-target" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition">➕ TAMBAH</button>
+        <div class="flex gap-3 mb-4"><input type="month" id="new-target-month" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <input type="number" id="new-target-value" placeholder="TARGET DOKUMEN" min="1" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 placeholder-gray-500"> <button id="add-target" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition">➕ TAMBAH</button>
         </div>
         <div id="targets-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
        </div><!-- Findings Management -->
@@ -332,8 +332,8 @@
 
     // Default Config
     const defaultConfig = {
-      app_title: 'BRFT MONITORING SYSTEM PT. GOF',
-      company_name: 'CREATED by MSTD',
+      app_title: 'BRFT MONITORING SYSTEM',
+      company_name: 'PHARMA QUALITY CONTROL',
       primary_color: '#10b981',
       background_color: '#111827',
       surface_color: '#1f2937',
@@ -1280,15 +1280,27 @@
       doc.line(15, y, 195, y);
       y += 5;
 
-      auditLogs.slice(0, 50).forEach(log => {
+      // Get current filtered logs from table
+      const tbody = document.getElementById('audit-table');
+      const rows = tbody.querySelectorAll('tr');
+      
+      if (rows.length === 1 && rows[0].textContent.includes('TIDAK ADA LOG')) {
+        showToast('TIDAK ADA DATA UNTUK DIEXPORT', 'error');
+        return;
+      }
+
+      rows.forEach(row => {
         if (y > 280) {
           doc.addPage();
           y = 20;
         }
-        doc.text(new Date(log.audit_timestamp).toLocaleString('ID-id').substring(0, 20), 15, y);
-        doc.text(log.audit_action || '', 70, y);
-        doc.text((log.audit_details || '').substring(0, 60), 100, y);
-        y += 6;
+        const cells = row.querySelectorAll('td');
+        if (cells.length >= 3) {
+          doc.text(cells[0].textContent.substring(0, 20), 15, y);
+          doc.text(cells[1].textContent.substring(0, 15), 70, y);
+          doc.text(cells[2].textContent.substring(0, 60), 100, y);
+          y += 6;
+        }
       });
 
       doc.save(`BRFT_AUDIT_${new Date().toISOString().split('T')[0]}.pdf`);
@@ -1330,5 +1342,5 @@
 
     init();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c1ff562f16ce782',t:'MTc2OTA5NDQyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c1ffcf8651d7a69',t:'MTc2OTA5NDczMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
