@@ -42,7 +42,7 @@
      </div>
      <div>
       <h1 id="app-title" class="text-xl font-bold text-emerald-400">BRFT MONITORING SYSTEM PT. GOF</h1>
-      <p id="company-name" class="text-xs text-gray-400">Created by MSTD</p>
+      <p id="company-name" class="text-xs text-gray-400">CREATED by MSTD</p>
      </div>
     </div>
     <div class="flex items-center gap-4"><span id="current-date" class="text-sm text-gray-400"></span> <button id="theme-toggle" class="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition">
@@ -107,12 +107,12 @@
        <div class="flex-1 min-w-[150px]"><label class="block text-xs text-gray-400 mb-1">KATEGORI</label> <select id="filter-category" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <option value="">SEMUA KATEGORI</option> </select>
        </div>
        <div class="flex-1 min-w-[150px]"><label class="block text-xs text-gray-400 mb-1">INISIAL OPERATOR</label> <select id="filter-operator" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <option value="">SEMUA OPERATOR</option> </select>
-       </div><button id="apply-filter" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition"> APPLY FILTER </button> <button id="reset-filter" class="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded-lg text-sm font-medium transition"> ↺ RESET </button>
+       </div><button id="apply-filter" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition"> ��� FILTER </button> <button id="reset-filter" class="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded-lg text-sm font-medium transition"> ↺ RESET </button>
       </div>
      </div><!-- Charts Grid -->
      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
       <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
-       <h3 class="text-sm font-semibold text-gray-300 mb-4"> TREND % BRFT PER BULAN</h3>
+       <h3 class="text-sm font-semibold text-gray-300 mb-4">���� TREND % BRFT PER BULAN</h3>
        <div class="h-64">
         <canvas id="chart-trend"></canvas>
        </div>
@@ -124,13 +124,13 @@
        </div>
       </div>
       <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
-       <h3 class="text-sm font-semibold text-gray-300 mb-4">📊 TEMUAN PER AREA</h3>
+       <h3 class="text-sm font-semibold text-gray-300 mb-4">�� TEMUAN PER AREA</h3>
        <div class="h-64">
         <canvas id="chart-area"></canvas>
        </div>
       </div>
       <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
-       <h3 class="text-sm font-semibold text-gray-300 mb-4">📊 TEMUAN PER KODE PRODUK</h3>
+       <h3 class="text-sm font-semibold text-gray-300 mb-4">��� TEMUAN PER KODE PRODUK</h3>
        <div class="h-64">
         <canvas id="chart-product"></canvas>
        </div>
@@ -333,7 +333,7 @@
     // Default Config
     const defaultConfig = {
       app_title: 'BRFT MONITORING SYSTEM PT. GOF',
-      company_name: 'Created by MSTD',
+      company_name: 'CREATED by MSTD',
       primary_color: '#10b981',
       background_color: '#111827',
       surface_color: '#1f2937',
@@ -931,14 +931,14 @@
       }
 
       tbody.innerHTML = logs.map(log => {
-        const actionColor = log.audit_action === 'CREATE' ? 'text-emerald-400' :
-                           log.audit_action === 'UPDATE' ? 'text-blue-400' :
-                           log.audit_action === 'DELETE' ? 'text-red-400' : 'text-amber-400';
+        const actionColor = log.action === 'CREATE' ? 'text-emerald-400' :
+                           log.action === 'UPDATE' ? 'text-blue-400' :
+                           log.action === 'DELETE' ? 'text-red-400' : 'text-amber-400';
         return `
           <tr class="hover:bg-gray-700/50">
-            <td class="py-3 px-3 text-gray-300 text-xs">${new Date(log.audit_timestamp).toLocaleString('ID-id')}</td>
-            <td class="py-3 px-3"><span class="px-2 py-1 rounded text-xs font-medium ${actionColor}">${log.audit_action}</span></td>
-            <td class="py-3 px-3 text-gray-300 text-xs">${log.audit_details}</td>
+            <td class="py-3 px-3 text-gray-300 text-xs">${new Date(log.created_at).toLocaleString('ID-id')}</td>
+            <td class="py-3 px-3"><span class="px-2 py-1 rounded text-xs font-medium ${actionColor}">${log.action}</span></td>
+            <td class="py-3 px-3 text-gray-300 text-xs">${log.details}</td>
           </tr>
         `;
       }).join('');
@@ -1240,12 +1240,12 @@
       const initial = document.getElementById('audit-filter-initial').value;
 
       let filtered = [...auditLogs];
-      if (dateFrom) filtered = filtered.filter(l => l.audit_timestamp >= dateFrom);
-      if (dateTo) filtered = filtered.filter(l => l.audit_timestamp <= dateTo + 'T23:59:59');
-      if (area) filtered = filtered.filter(l => l.audit_area === area);
-      if (product) filtered = filtered.filter(l => l.audit_product === product);
-      if (category) filtered = filtered.filter(l => l.audit_category === category);
-      if (initial) filtered = filtered.filter(l => l.audit_initial === initial);
+      if (dateFrom) filtered = filtered.filter(l => l.created_at >= dateFrom);
+      if (dateTo) filtered = filtered.filter(l => l.created_at <= dateTo + 'T23:59:59');
+      if (area) filtered = filtered.filter(l => l.area === area);
+      if (product) filtered = filtered.filter(l => l.product === product);
+      if (category) filtered = filtered.filter(l => l.category === category);
+      if (initial) filtered = filtered.filter(l => l.operator_initial === initial);
 
       updateAuditTable(filtered);
     });
@@ -1330,5 +1330,5 @@
 
     init();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c1fcf163091e78b',t:'MTc2OTA5Mjg1Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c1ff562f16ce782',t:'MTc2OTA5NDQyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
