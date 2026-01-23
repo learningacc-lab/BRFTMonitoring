@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BRFT MONITORING SYSTEM PT. GOF</title>
+  <title>BRFT MONITORING SYSTEM</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
@@ -41,11 +41,15 @@
       </svg>
      </div>
      <div>
-      <h1 id="app-title" class="text-xl font-bold text-emerald-400">BRFT MONITORING SYSTEM PT. GOF</h1>
-      <p id="company-name" class="text-xs text-gray-400">CREATED by MSTD</p>
+      <h1 id="app-title" class="text-xl font-bold text-emerald-400">BRFT MONITORING SYSTEM</h1>
+      <p id="company-name" class="text-xs text-gray-400">PHARMA QUALITY CONTROL</p>
      </div>
     </div>
-    <div class="flex items-center gap-4"><span id="current-date" class="text-sm text-gray-400"></span> <button id="theme-toggle" class="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition">
+    <div class="flex items-center gap-4">
+     <div class="text-right">
+      <div id="current-date" class="text-sm text-gray-400 font-medium"></div>
+      <div id="current-time" class="text-xs text-emerald-400 font-bold tracking-wider mt-1"></div>
+     </div><button id="theme-toggle" class="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
       </svg></button>
     </div>
@@ -72,7 +76,7 @@
       <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
        <div class="flex items-center justify-between">
         <div>
-         <p class="text-xs text-gray-400 mb-1">TOTAL DOKUMEN</p>
+         <p class="text-xs text-gray-400 mb-1">TARGET DOKUMEN</p>
          <p id="target-docs" class="text-3xl font-bold text-blue-400">0</p>
         </div>
         <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
@@ -84,7 +88,7 @@
       <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
        <div class="flex items-center justify-between">
         <div>
-         <p class="text-xs text-gray-400 mb-1">% BRFT</p>
+         <p class="text-xs text-gray-400 mb-1">% BRFT BULAN INI</p>
          <p id="brft-percentage" class="text-3xl font-bold">-</p>
         </div>
         <div id="brft-indicator" class="w-12 h-12 bg-gray-500/20 rounded-xl flex items-center justify-center">
@@ -107,12 +111,12 @@
        <div class="flex-1 min-w-[150px]"><label class="block text-xs text-gray-400 mb-1">KATEGORI</label> <select id="filter-category" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <option value="">SEMUA KATEGORI</option> </select>
        </div>
        <div class="flex-1 min-w-[150px]"><label class="block text-xs text-gray-400 mb-1">INISIAL OPERATOR</label> <select id="filter-operator" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <option value="">SEMUA OPERATOR</option> </select>
-       </div><button id="apply-filter" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition"> ��� FILTER </button> <button id="reset-filter" class="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded-lg text-sm font-medium transition"> ↺ RESET </button>
+       </div><button id="apply-filter" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition"> 🔍 FILTER </button> <button id="reset-filter" class="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded-lg text-sm font-medium transition"> ↺ RESET </button>
       </div>
      </div><!-- Charts Grid -->
      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
       <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
-       <h3 class="text-sm font-semibold text-gray-300 mb-4">���� TREND % BRFT PER BULAN</h3>
+       <h3 class="text-sm font-semibold text-gray-300 mb-4">📈 TREND % BRFT PER BULAN</h3>
        <div class="h-64">
         <canvas id="chart-trend"></canvas>
        </div>
@@ -124,13 +128,13 @@
        </div>
       </div>
       <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
-       <h3 class="text-sm font-semibold text-gray-300 mb-4">�� TEMUAN PER AREA</h3>
+       <h3 class="text-sm font-semibold text-gray-300 mb-4">🏭 TEMUAN PER AREA</h3>
        <div class="h-64">
         <canvas id="chart-area"></canvas>
        </div>
       </div>
       <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
-       <h3 class="text-sm font-semibold text-gray-300 mb-4">��� TEMUAN PER KODE PRODUK</h3>
+       <h3 class="text-sm font-semibold text-gray-300 mb-4">📦 TEMUAN PER KODE PRODUK</h3>
        <div class="h-64">
         <canvas id="chart-product"></canvas>
        </div>
@@ -174,7 +178,7 @@
     <div id="input-tab" class="tab-content hidden">
      <div class="max-w-2xl mx-auto">
       <div class="bg-gray-800 rounded-xl p-6 card-shadow border border-gray-700">
-       <h2 class="text-lg font-bold text-emerald-400 mb-6 flex items-center gap-2"><span>���</span> INPUT TEMUAN BRFT</h2>
+       <h2 class="text-lg font-bold text-emerald-400 mb-6 flex items-center gap-2"><span>➕</span> INPUT TEMUAN BRFT</h2>
        <form id="finding-form" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
          <div><label class="block text-xs text-gray-400 mb-1">TANGGAL TEMUAN *</label> <input type="date" id="input-date" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
@@ -245,7 +249,7 @@
         <div id="categories-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
        </div><!-- Targets Management -->
        <div id="mgmt-targets" class="mgmt-content hidden">
-        <div class="flex gap-3 mb-4"><input type="month" id="new-target-month" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <input type="number" id="new-target-value" placeholder="TOTAL DOKUMEN" min="1" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 placeholder-gray-500"> <button id="add-target" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition">➕ TAMBAH</button>
+        <div class="flex gap-3 mb-4"><input type="month" id="new-target-month" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <input type="number" id="new-target-value" placeholder="TARGET DOKUMEN" min="1" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 placeholder-gray-500"> <button id="add-target" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition">➕ TAMBAH</button>
         </div>
         <div id="targets-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
        </div><!-- Findings Management -->
@@ -309,7 +313,7 @@
   <div id="toast-container"></div><!-- Delete Confirmation Modal -->
   <div id="delete-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
    <div class="bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 border border-gray-700">
-    <h3 class="text-lg font-bold text-white mb-2">⚠️ KONFIRMASI HAPUS</h3>
+    <h3 class="text-lg font-bold text-white mb-2">⚠��� KONFIRMASI HAPUS</h3>
     <p id="delete-message" class="text-gray-400 mb-6">APAKAH ANDA YAKIN INGIN MENGHAPUS DATA INI?</p>
     <div class="flex gap-3"><button id="confirm-delete" class="flex-1 bg-red-600 hover:bg-red-700 py-2 rounded-lg font-medium transition">🗑️ HAPUS</button> <button id="cancel-delete" class="flex-1 bg-gray-600 hover:bg-gray-500 py-2 rounded-lg font-medium transition">❌ BATAL</button>
     </div>
@@ -332,8 +336,8 @@
 
     // Default Config
     const defaultConfig = {
-      app_title: 'BRFT MONITORING SYSTEM PT. GOF',
-      company_name: 'CREATED by MSTD',
+      app_title: 'BRFT MONITORING SYSTEM',
+      company_name: 'PHARMA QUALITY CONTROL',
       primary_color: '#10b981',
       background_color: '#111827',
       surface_color: '#1f2937',
@@ -430,17 +434,22 @@
       
       tables.forEach(table => {
         const subscription = supabaseClient
-          .channel(`${table}_changes`)
+          .channel(`public:${table}`)
           .on('postgres_changes', { 
             event: '*', 
             schema: 'public', 
             table: table 
           }, async (payload) => {
-            console.log(`Real-time update detected on ${table}:`, payload);
+            console.log(`✅ Real-time update detected on ${table}:`, payload.eventType);
+            // Reload data immediately when change detected
             await loadAllData();
           })
           .subscribe((status) => {
-            console.log(`Subscription status for ${table}:`, status);
+            if (status === 'SUBSCRIBED') {
+              console.log(`✅ Subscribed to ${table} changes`);
+            } else {
+              console.log(`⚠️ Subscription status for ${table}:`, status);
+            }
           });
         
         subscriptions.push(subscription);
@@ -803,7 +812,7 @@
         return;
       }
 
-      tbody.innerHTML = filteredFindings.sort((a, b) => new Date(b.date) - new Date(a.date)).map(f => {
+      tbody.innerHTML = filteredFindings.sort((a, b) => new Date(a.date) - new Date(b.date)).map(f => {
         // Format date as dd MMM YYYY (e.g., 22 JAN 2026)
         let formattedDate = '-';
         if (f.date) {
@@ -1360,10 +1369,19 @@
       document.body.classList.toggle('text-gray-100');
     });
 
-    // Set current date
-    document.getElementById('current-date').textContent = new Date().toLocaleDateString('ID-id', { 
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
-    }).toUpperCase();
+    // Update Date and Time
+    function updateDateTime() {
+      document.getElementById('current-date').textContent = new Date().toLocaleDateString('ID-id', { 
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+      }).toUpperCase();
+      
+      document.getElementById('current-time').textContent = new Date().toLocaleTimeString('ID-id', {
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      });
+    }
+
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
 
     // Initialize Data SDK
     async function init() {
@@ -1387,5 +1405,5 @@
 
     init();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c2010a8f722ff78',t:'MTc2OTA5NTUzOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c23263b10613e5b',t:'MTc2OTEyNzg3OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
