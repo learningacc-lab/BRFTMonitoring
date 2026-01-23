@@ -750,12 +750,13 @@
       // Chart 3: By Area
       const areaData = {};
       filteredFindings.forEach(f => { if (f.area) areaData[f.area] = (areaData[f.area] || 0) + 1; });
+      const areaSorted = Object.entries(areaData).sort((a, b) => b[1] - a[1]);
       if (charts.area) charts.area.destroy();
       charts.area = new Chart(document.getElementById('chart-area'), {
         type: 'bar',
         data: {
-          labels: Object.keys(areaData),
-          datasets: [{ data: Object.values(areaData), backgroundColor: '#3b82f6' }]
+          labels: areaSorted.map(a => a[0]),
+          datasets: [{ data: areaSorted.map(a => a[1]), backgroundColor: '#3b82f6' }]
         },
         options: chartOptions,
         plugins: [ChartDataLabels]
@@ -764,12 +765,13 @@
       // Chart 4: By Product
       const productData = {};
       filteredFindings.forEach(f => { if (f.product_code) productData[f.product_code] = (productData[f.product_code] || 0) + 1; });
+      const productSorted = Object.entries(productData).sort((a, b) => b[1] - a[1]);
       if (charts.product) charts.product.destroy();
       charts.product = new Chart(document.getElementById('chart-product'), {
         type: 'bar',
         data: {
-          labels: Object.keys(productData),
-          datasets: [{ data: Object.values(productData), backgroundColor: '#8b5cf6' }]
+          labels: productSorted.map(p => p[0]),
+          datasets: [{ data: productSorted.map(p => p[1]), backgroundColor: '#8b5cf6' }]
         },
         options: chartOptions,
         plugins: [ChartDataLabels]
@@ -778,12 +780,13 @@
       // Chart 5: By Operator
       const operatorData = {};
       filteredFindings.forEach(f => { if (f.operator_initial) operatorData[f.operator_initial] = (operatorData[f.operator_initial] || 0) + 1; });
+      const operatorSorted = Object.entries(operatorData).sort((a, b) => b[1] - a[1]);
       if (charts.operator) charts.operator.destroy();
       charts.operator = new Chart(document.getElementById('chart-operator'), {
         type: 'bar',
         data: {
-          labels: Object.keys(operatorData),
-          datasets: [{ data: Object.values(operatorData), backgroundColor: '#ec4899' }]
+          labels: operatorSorted.map(o => o[0]),
+          datasets: [{ data: operatorSorted.map(o => o[1]), backgroundColor: '#ec4899' }]
         },
         options: chartOptions,
         plugins: [ChartDataLabels]
@@ -792,12 +795,13 @@
       // Chart 6: By Category
       const categoryData = {};
       filteredFindings.forEach(f => { if (f.category) categoryData[f.category] = (categoryData[f.category] || 0) + 1; });
+      const categorySorted = Object.entries(categoryData).sort((a, b) => b[1] - a[1]);
       if (charts.category) charts.category.destroy();
       charts.category = new Chart(document.getElementById('chart-category'), {
         type: 'bar',
         data: {
-          labels: Object.keys(categoryData),
-          datasets: [{ data: Object.values(categoryData), backgroundColor: '#14b8a6' }]
+          labels: categorySorted.map(c => c[0]),
+          datasets: [{ data: categorySorted.map(c => c[1]), backgroundColor: '#14b8a6' }]
         },
         options: chartOptions,
         plugins: [ChartDataLabels]
@@ -1405,5 +1409,5 @@
 
     init();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c23263b10613e5b',t:'MTc2OTEyNzg3OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c23327330025ff1',t:'MTc2OTEyODM3OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
