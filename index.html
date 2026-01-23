@@ -88,7 +88,7 @@
       <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
        <div class="flex items-center justify-between">
         <div>
-         <p class="text-xs text-gray-400 mb-1">Σ TOTAL BATCH</p>
+         <p class="text-xs text-gray-400 mb-1">TARGET DOKUMEN</p>
          <p id="target-docs" class="text-3xl font-bold text-blue-400">0</p>
         </div>
         <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
@@ -116,13 +116,49 @@
        </div>
        <div class="flex-1 min-w-[150px]"><label class="block text-xs text-gray-400 mb-1">SAMPAI TANGGAL</label> <input type="date" id="filter-date-to" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
        </div>
-       <div class="flex-1 min-w-[150px]"><label class="block text-xs text-gray-400 mb-1">AREA</label> <select id="filter-area" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <option value="">SEMUA AREA</option> </select>
+       <div class="flex-1 min-w-[150px] relative"><label class="block text-xs text-gray-400 mb-1">AREA</label>
+        <div class="multi-select-wrapper"><button type="button" id="filter-area-btn" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm text-left flex items-center justify-between hover:border-emerald-500 transition"> <span id="filter-area-label">SEMUA AREA</span>
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg></button>
+         <div id="filter-area-dropdown" class="hidden absolute z-50 mt-1 w-full bg-gray-700 border border-gray-600 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+          <div class="p-2 border-b border-gray-600"><label class="flex items-center gap-2 px-2 py-1 hover:bg-gray-600 rounded cursor-pointer"> <input type="checkbox" id="filter-area-all" class="form-checkbox text-emerald-600 rounded" checked> <span class="text-sm">PILIH SEMUA</span> </label>
+          </div>
+          <div id="filter-area-list" class="p-2"></div>
+         </div>
+        </div>
        </div>
-       <div class="flex-1 min-w-[150px]"><label class="block text-xs text-gray-400 mb-1">KODE PRODUK</label> <select id="filter-product" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <option value="">SEMUA PRODUK</option> </select>
+       <div class="flex-1 min-w-[150px] relative"><label class="block text-xs text-gray-400 mb-1">KODE PRODUK</label>
+        <div class="multi-select-wrapper"><button type="button" id="filter-product-btn" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm text-left flex items-center justify-between hover:border-emerald-500 transition"> <span id="filter-product-label">SEMUA PRODUK</span>
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg></button>
+         <div id="filter-product-dropdown" class="hidden absolute z-50 mt-1 w-full bg-gray-700 border border-gray-600 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+          <div class="p-2 border-b border-gray-600"><label class="flex items-center gap-2 px-2 py-1 hover:bg-gray-600 rounded cursor-pointer"> <input type="checkbox" id="filter-product-all" class="form-checkbox text-emerald-600 rounded" checked> <span class="text-sm">PILIH SEMUA</span> </label>
+          </div>
+          <div id="filter-product-list" class="p-2"></div>
+         </div>
+        </div>
        </div>
-       <div class="flex-1 min-w-[150px]"><label class="block text-xs text-gray-400 mb-1">KATEGORI</label> <select id="filter-category" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <option value="">SEMUA KATEGORI</option> </select>
+       <div class="flex-1 min-w-[150px] relative"><label class="block text-xs text-gray-400 mb-1">KATEGORI</label>
+        <div class="multi-select-wrapper"><button type="button" id="filter-category-btn" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm text-left flex items-center justify-between hover:border-emerald-500 transition"> <span id="filter-category-label">SEMUA KATEGORI</span>
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg></button>
+         <div id="filter-category-dropdown" class="hidden absolute z-50 mt-1 w-full bg-gray-700 border border-gray-600 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+          <div class="p-2 border-b border-gray-600"><label class="flex items-center gap-2 px-2 py-1 hover:bg-gray-600 rounded cursor-pointer"> <input type="checkbox" id="filter-category-all" class="form-checkbox text-emerald-600 rounded" checked> <span class="text-sm">PILIH SEMUA</span> </label>
+          </div>
+          <div id="filter-category-list" class="p-2"></div>
+         </div>
+        </div>
        </div>
-       <div class="flex-1 min-w-[150px]"><label class="block text-xs text-gray-400 mb-1">INISIAL OPERATOR</label> <select id="filter-operator" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <option value="">SEMUA OPERATOR</option> </select>
+       <div class="flex-1 min-w-[150px] relative"><label class="block text-xs text-gray-400 mb-1">INISIAL OPERATOR</label>
+        <div class="multi-select-wrapper"><button type="button" id="filter-operator-btn" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm text-left flex items-center justify-between hover:border-emerald-500 transition"> <span id="filter-operator-label">SEMUA OPERATOR</span>
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg></button>
+         <div id="filter-operator-dropdown" class="hidden absolute z-50 mt-1 w-full bg-gray-700 border border-gray-600 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+          <div class="p-2 border-b border-gray-600"><label class="flex items-center gap-2 px-2 py-1 hover:bg-gray-600 rounded cursor-pointer"> <input type="checkbox" id="filter-operator-all" class="form-checkbox text-emerald-600 rounded" checked> <span class="text-sm">PILIH SEMUA</span> </label>
+          </div>
+          <div id="filter-operator-list" class="p-2"></div>
+         </div>
+        </div>
        </div><button id="apply-filter" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition"> 🔍 FILTER </button> <button id="reset-filter" class="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded-lg text-sm font-medium transition"> ↺ RESET </button>
       </div>
      </div><!-- Charts Grid -->
@@ -134,7 +170,7 @@
        </div>
       </div>
       <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
-       <h3 class="text-sm font-semibold text-gray-300 mb-4">📊 TEMUAN PER BULAN</h3>
+       <h3 class="text-sm font-semibold text-gray-300 mb-4">📊 TREND TEMUAN PER BULAN</h3>
        <div class="h-64">
         <canvas id="chart-monthly"></canvas>
        </div>
@@ -226,7 +262,7 @@
         <p class="text-xs text-gray-400 mt-1">MASUKKAN PASSWORD UNTUK AKSES MANAJEMEN</p>
        </div>
        <div class="space-y-4">
-        <div><label class="block text-xs text-gray-400 mb-1">PASSWORD</label> <input type="password" id="admin-password" placeholder="••••••••" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500 placeholder-gray-500">
+        <div><label class="block text-xs text-gray-400 mb-1">PASSWORD</label> <input type="password" id="admin-password" placeholder="••••••��•" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500 placeholder-gray-500">
         </div><button id="admin-login-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 py-3 rounded-lg font-medium transition"> 🔓 LOGIN </button>
        </div>
       </div>
@@ -261,7 +297,7 @@
         <div id="categories-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
        </div><!-- Targets Management -->
        <div id="mgmt-targets" class="mgmt-content hidden">
-        <div class="flex gap-3 mb-4"><input type="month" id="new-target-month" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <input type="number" id="new-target-value" placeholder="Σ TOTAL BATCH" min="1" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 placeholder-gray-500"> <button id="add-target" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition">����� TAMBAH</button>
+        <div class="flex gap-3 mb-4"><input type="month" id="new-target-month" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <input type="number" id="new-target-value" placeholder="TARGET DOKUMEN" min="1" class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-emerald-500 placeholder-gray-500"> <button id="add-target" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition">����� TAMBAH</button>
         </div>
         <div id="targets-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
        </div><!-- Findings Management -->
@@ -532,6 +568,14 @@
       });
     });
 
+    // Multi-select filter state
+    const selectedFilters = {
+      areas: new Set(),
+      products: new Set(),
+      categories: new Set(),
+      operators: new Set()
+    };
+
     // Update Dropdowns
     function updateDropdowns() {
       const areaOptions = '<option value="">PILIH AREA</option>' + areas.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
@@ -544,17 +588,137 @@
       document.getElementById('input-product').innerHTML = productOptions;
       document.getElementById('input-operator').innerHTML = operatorOptions;
 
-      // Filter dropdowns
-      document.getElementById('filter-area').innerHTML = '<option value="">SEMUA AREA</option>' + areas.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
-      document.getElementById('filter-product').innerHTML = '<option value="">SEMUA PRODUK</option>' + products.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
-      document.getElementById('filter-category').innerHTML = '<option value="">SEMUA KATEGORI</option>' + categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-      document.getElementById('filter-operator').innerHTML = '<option value="">SEMUA OPERATOR</option>' + operators.map(o => `<option value="${o.name}">${o.name}</option>`).join('');
+      // Multi-select filter checkboxes
+      updateMultiSelectList('area', areas);
+      updateMultiSelectList('product', products);
+      updateMultiSelectList('category', categories);
+      updateMultiSelectList('operator', operators);
 
       // Audit filter dropdowns
       document.getElementById('audit-filter-area').innerHTML = '<option value="">SEMUA</option>' + areas.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
       document.getElementById('audit-filter-product').innerHTML = '<option value="">SEMUA</option>' + products.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
       document.getElementById('audit-filter-category').innerHTML = '<option value="">SEMUA</option>' + categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
       document.getElementById('audit-filter-initial').innerHTML = '<option value="">SEMUA</option>' + operators.map(o => `<option value="${o.name}">${o.name}</option>`).join('');
+    }
+
+    // Update multi-select checkbox list
+    function updateMultiSelectList(type, items) {
+      const listEl = document.getElementById(`filter-${type}-list`);
+      
+      // Map type to filterKey correctly
+      let filterKey;
+      if (type === 'area') filterKey = 'areas';
+      else if (type === 'product') filterKey = 'products';
+      else if (type === 'category') filterKey = 'categories';
+      else if (type === 'operator') filterKey = 'operators';
+      
+      listEl.innerHTML = items.map(item => `
+        <label class="flex items-center gap-2 px-2 py-1 hover:bg-gray-600 rounded cursor-pointer">
+          <input type="checkbox" class="filter-${type}-checkbox form-checkbox text-emerald-600 rounded" 
+                 value="${item.name}" ${selectedFilters[filterKey].has(item.name) ? 'checked' : ''}>
+          <span class="text-sm">${item.name}</span>
+        </label>
+      `).join('');
+
+      // Add event listeners to checkboxes
+      listEl.querySelectorAll(`.filter-${type}-checkbox`).forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+          if (e.target.checked) {
+            selectedFilters[filterKey].add(e.target.value);
+          } else {
+            selectedFilters[filterKey].delete(e.target.value);
+          }
+          updateMultiSelectLabel(type);
+          
+          // Update "Select All" checkbox state
+          const allCheckbox = document.getElementById(`filter-${type}-all`);
+          allCheckbox.checked = selectedFilters[filterKey].size === items.length;
+        });
+      });
+    }
+
+    // Update multi-select label based on selected items
+    function updateMultiSelectLabel(type) {
+      // Map type to filterKey correctly
+      let filterKey;
+      if (type === 'area') filterKey = 'areas';
+      else if (type === 'product') filterKey = 'products';
+      else if (type === 'category') filterKey = 'categories';
+      else if (type === 'operator') filterKey = 'operators';
+      
+      const labelEl = document.getElementById(`filter-${type}-label`);
+      const count = selectedFilters[filterKey].size;
+      
+      if (count === 0) {
+        if (type === 'area') labelEl.textContent = 'SEMUA AREA';
+        else if (type === 'product') labelEl.textContent = 'SEMUA PRODUK';
+        else if (type === 'category') labelEl.textContent = 'SEMUA KATEGORI';
+        else if (type === 'operator') labelEl.textContent = 'SEMUA OPERATOR';
+      } else if (count === 1) {
+        labelEl.textContent = Array.from(selectedFilters[filterKey])[0];
+      } else {
+        if (type === 'area') labelEl.textContent = `${count} AREA DIPILIH`;
+        else if (type === 'product') labelEl.textContent = `${count} PRODUK DIPILIH`;
+        else if (type === 'category') labelEl.textContent = `${count} KATEGORI DIPILIH`;
+        else if (type === 'operator') labelEl.textContent = `${count} OPERATOR DIPILIH`;
+      }
+    }
+
+    // Setup multi-select dropdown toggles
+    function setupMultiSelectDropdowns() {
+      ['area', 'product', 'category', 'operator'].forEach(type => {
+        const btn = document.getElementById(`filter-${type}-btn`);
+        const dropdown = document.getElementById(`filter-${type}-dropdown`);
+        const selectAllCheckbox = document.getElementById(`filter-${type}-all`);
+        
+        // Toggle dropdown
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          // Close all other dropdowns
+          ['area', 'product', 'category', 'operator'].forEach(t => {
+            if (t !== type) {
+              document.getElementById(`filter-${t}-dropdown`).classList.add('hidden');
+            }
+          });
+          dropdown.classList.toggle('hidden');
+        });
+
+        // Select All checkbox
+        selectAllCheckbox.addEventListener('change', (e) => {
+          // Map type to filterKey correctly
+          let filterKey;
+          if (type === 'area') filterKey = 'areas';
+          else if (type === 'product') filterKey = 'products';
+          else if (type === 'category') filterKey = 'categories';
+          else if (type === 'operator') filterKey = 'operators';
+          
+          const checkboxes = document.querySelectorAll(`.filter-${type}-checkbox`);
+          
+          if (e.target.checked) {
+            // Select all
+            checkboxes.forEach(cb => {
+              cb.checked = true;
+              selectedFilters[filterKey].add(cb.value);
+            });
+          } else {
+            // Deselect all
+            checkboxes.forEach(cb => {
+              cb.checked = false;
+              selectedFilters[filterKey].delete(cb.value);
+            });
+          }
+          updateMultiSelectLabel(type);
+        });
+      });
+
+      // Close dropdowns when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.multi-select-wrapper')) {
+          ['area', 'product', 'category', 'operator'].forEach(type => {
+            document.getElementById(`filter-${type}-dropdown`).classList.add('hidden');
+          });
+        }
+      });
     }
 
     // Calculate BRFT Percentage
@@ -572,17 +736,23 @@
       let filteredFindings = [...findings];
       const dateFrom = document.getElementById('filter-date-from').value;
       const dateTo = document.getElementById('filter-date-to').value;
-      const filterArea = document.getElementById('filter-area').value;
-      const filterProduct = document.getElementById('filter-product').value;
-      const filterCategory = document.getElementById('filter-category').value;
-      const filterOperator = document.getElementById('filter-operator').value;
 
       if (dateFrom) filteredFindings = filteredFindings.filter(f => f.date >= dateFrom);
       if (dateTo) filteredFindings = filteredFindings.filter(f => f.date <= dateTo);
-      if (filterArea) filteredFindings = filteredFindings.filter(f => f.area_name === filterArea);
-      if (filterProduct) filteredFindings = filteredFindings.filter(f => f.product_name === filterProduct);
-      if (filterCategory) filteredFindings = filteredFindings.filter(f => f.category_name === filterCategory);
-      if (filterOperator) filteredFindings = filteredFindings.filter(f => f.operator_name === filterOperator);
+      
+      // Multi-select filters
+      if (selectedFilters.areas.size > 0) {
+        filteredFindings = filteredFindings.filter(f => selectedFilters.areas.has(f.area_name));
+      }
+      if (selectedFilters.products.size > 0) {
+        filteredFindings = filteredFindings.filter(f => selectedFilters.products.has(f.product_name));
+      }
+      if (selectedFilters.categories.size > 0) {
+        filteredFindings = filteredFindings.filter(f => selectedFilters.categories.has(f.category_name));
+      }
+      if (selectedFilters.operators.size > 0) {
+        filteredFindings = filteredFindings.filter(f => selectedFilters.operators.has(f.operator_name));
+      }
 
       // Summary cards - show filtered total
       document.getElementById('total-findings').textContent = filteredFindings.length;
@@ -1274,12 +1444,31 @@
     // Filters
     document.getElementById('apply-filter').addEventListener('click', updateDashboard);
     document.getElementById('reset-filter').addEventListener('click', () => {
-      document.getElementById('filter-date-from').value = '';
-      document.getElementById('filter-date-to').value = '';
-      document.getElementById('filter-area').value = '';
-      document.getElementById('filter-product').value = '';
-      document.getElementById('filter-category').value = '';
-      document.getElementById('filter-operator').value = '';
+      // Reset to current month range (not empty)
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const firstDay = `${year}-${month}-01`;
+      const lastDay = new Date(year, now.getMonth() + 1, 0).getDate();
+      const lastDayFormatted = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
+
+      document.getElementById('filter-date-from').value = firstDay;
+      document.getElementById('filter-date-to').value = lastDayFormatted;
+      
+      // Reset multi-select filters
+      selectedFilters.areas.clear();
+      selectedFilters.products.clear();
+      selectedFilters.categories.clear();
+      selectedFilters.operators.clear();
+      
+      // Reset checkboxes and labels
+      ['area', 'product', 'category', 'operator'].forEach(type => {
+        const filterKey = type + 's';
+        document.getElementById(`filter-${type}-all`).checked = true;
+        document.querySelectorAll(`.filter-${type}-checkbox`).forEach(cb => cb.checked = false);
+        updateMultiSelectLabel(type);
+      });
+      
       updateDashboard();
     });
 
@@ -1428,6 +1617,9 @@
       document.getElementById('filter-date-from').value = firstDay;
       document.getElementById('filter-date-to').value = lastDayFormatted;
 
+      // Setup multi-select dropdowns
+      setupMultiSelectDropdowns();
+
       // Load data from Supabase
       await loadAllData();
 
@@ -1440,5 +1632,5 @@
 
     init();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c2475ef8590e78f',t:'MTc2OTE0MTYyOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c24c32a93bb4ac4',t:'MTc2OTE0NDc5My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
