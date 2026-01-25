@@ -170,7 +170,7 @@
        </div>
       </div>
       <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
-       <h3 class="text-sm font-semibold text-gray-300 mb-4">📊 TREND TEMUAN PER BULAN</h3>
+       <h3 class="text-sm font-semibold text-gray-300 mb-4">📊 TREN TREND TEMUAN PER BULAN</h3>
        <div class="h-64">
         <canvas id="chart-monthly"></canvas>
        </div>
@@ -262,7 +262,7 @@
         <p class="text-xs text-gray-400 mt-1">MASUKKAN PASSWORD UNTUK AKSES MANAJEMEN</p>
        </div>
        <div class="space-y-4">
-        <div><label class="block text-xs text-gray-400 mb-1">PASSWORD</label> <input type="password" id="admin-password" placeholder="•••••••••" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500 placeholder-gray-500">
+        <div><label class="block text-xs text-gray-400 mb-1">PASSWORD</label> <input type="password" id="admin-password" placeholder="••••••��•" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500 placeholder-gray-500">
         </div><button id="admin-login-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 py-3 rounded-lg font-medium transition"> 🔓 LOGIN </button>
        </div>
       </div>
@@ -337,7 +337,7 @@
       </div>
      </div>
      <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
-      <h3 class="text-sm font-semibold text-gray-300 mb-4">📋 AUDIT TRAIL LOG</h3>
+      <h3 class="text-sm font-semibold text-gray-300 mb-4">������ AUDIT TRAIL LOG</h3>
       <div class="overflow-x-auto max-h-96">
        <table class="w-full text-sm">
         <thead class="sticky top-0 bg-gray-800">
@@ -896,8 +896,14 @@
       const brftTrend = months.map(m => {
         const target = targets.find(t => t.target_month === m);
         if (target) {
-          const pct = calculateBRFT(m, target.target_value, monthlyData[m]);
-          return pct !== null ? pct : 0;
+          // Count UNIQUE BATCHES with findings for this month (same as % BRFT logic)
+          const findingsInMonth = findings.filter(f => f.date && f.date.startsWith(m));
+          const uniqueBatchSet = new Set(findingsInMonth.map(f => f.batch_number).filter(b => b));
+          const uniqueBatchCount = uniqueBatchSet.size;
+          
+          // Calculate % BRFT using unique batches (not total findings)
+          const pct = target.target_value > 0 ? ((target.target_value - uniqueBatchCount) / target.target_value) * 100 : 0;
+          return pct;
         }
         return 0;
       });
@@ -1074,7 +1080,7 @@
                 </div>
                 <div class="flex gap-2">
                   <button class="edit-target text-blue-400 hover:text-blue-300 p-1" data-id="${t.id}">✏️</button>
-                  <button class="delete-target text-red-400 hover:text-red-300 p-1" data-id="${t.id}">🗑️</button>
+                  <button class="delete-target text-red-400 hover:text-red-300 p-1" data-id="${t.id}">����️</button>
                 </div>
               </div>
             `;
@@ -1632,5 +1638,5 @@
 
     init();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c24c32a93bb4ac4',t:'MTc2OTE0NDc5My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c35fe292740fb90',t:'MTc2OTMyNTQ2Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
