@@ -982,18 +982,68 @@
         plugins: [ChartDataLabels]
       });
 
-      // Chart 5: By Operator
+      // Chart 5: By Operator (DIMODIFIKASI agar semua nama terlihat)
       const operatorData = {};
-      filteredFindings.forEach(f => { if (f.operator_initial) operatorData[f.operator_initial] = (operatorData[f.operator_initial] || 0) + 1; });
+      filteredFindings.forEach(f => { 
+        if (f.operator_initial) operatorData[f.operator_initial] = (operatorData[f.operator_initial] || 0) + 1; 
+      });
       const operatorSorted = Object.entries(operatorData).sort((a, b) => b[1] - a[1]);
+      
       if (charts.operator) charts.operator.destroy();
       charts.operator = new Chart(document.getElementById('chart-operator'), {
         type: 'bar',
         data: {
           labels: operatorSorted.map(o => o[0]),
-          datasets: [{ data: operatorSorted.map(o => o[1]), backgroundColor: '#ec4899' }]
+          datasets: [{ 
+            data: operatorSorted.map(o => o[1]), 
+            backgroundColor: '#ec4899' 
+          }]
         },
-        options: chartOptions,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { 
+            legend: { display: false },
+            datalabels: {
+              anchor: 'center',
+              align: 'center',
+              color: '#ffffff',
+              font: { size: 12, weight: 'bold' },
+              formatter: (value) => value > 0 ? value : ''
+            }
+          },
+          scales: {
+            x: { 
+              grid: { color: '#374151' }, 
+              ticks: { 
+                color: '#9ca3af', 
+                font: { size: 9 },
+                // 🔥 MODIFIKASI: Rotasi label agar semua nama operator terlihat
+                maxRotation: 90,
+                minRotation: 45,
+                autoSkip: false // Pastikan semua label ditampilkan
+              },
+              // Tambahkan padding untuk label yang panjang
+              afterFit: function(scale) {
+                scale.height = scale.height + 40;
+              }
+            },
+            y: { 
+              grid: { color: '#374151' }, 
+              ticks: { 
+                color: '#9ca3af', 
+                font: { size: 10 },
+                precision: 0
+              },
+              beginAtZero: true
+            }
+          },
+          layout: {
+            padding: {
+              bottom: 40 // Tambah padding bawah untuk label yang dirotasi
+            }
+          }
+        },
         plugins: [ChartDataLabels]
       });
 
@@ -1640,5 +1690,5 @@
 
     init();
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c35fe292740fb90',t:'MTc2OTMyNTQ2Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ </body>
 </html>
