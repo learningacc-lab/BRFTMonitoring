@@ -9,6 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="/_sdk/element_sdk.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <style>
@@ -201,11 +202,18 @@
       </div>
      </div><!-- Data Table -->
      <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
-      <h3 class="text-sm font-semibold text-gray-300 mb-4">📋 DETAIL TEMUAN</h3>
+      <div class="flex justify-between items-center mb-4">
+       <h3 class="text-sm font-semibold text-gray-300">📋 DETAIL TEMUAN</h3>
+       <div class="flex gap-2">
+        <button id="export-pdf-findings" class="bg-red-600 hover:bg-red-700 px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-2"> 📄 PDF </button>
+        <button id="export-excel-findings" class="bg-green-600 hover:bg-green-700 px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-2"> 📊 EXCEL </button>
+       </div>
+      </div>
       <div class="overflow-x-auto">
        <table class="w-full text-sm">
         <thead>
          <tr class="border-b border-gray-700">
+          <th class="text-left py-3 px-3 text-gray-400 font-medium">NO</th>
           <th class="text-left py-3 px-3 text-gray-400 font-medium">TANGGAL</th>
           <th class="text-left py-3 px-3 text-gray-400 font-medium">INISIAL</th>
           <th class="text-left py-3 px-3 text-gray-400 font-medium">AREA</th>
@@ -216,7 +224,7 @@
         </thead>
         <tbody id="findings-table" class="divide-y divide-gray-700">
          <tr>
-          <td colspan="6" class="py-8 text-center text-gray-500">TIDAK ADA DATA</td>
+          <td colspan="7" class="py-8 text-center text-gray-500">TIDAK ADA DATA</td>
          </tr>
         </tbody>
        </table>
@@ -240,7 +248,7 @@
          <div><label class="block text-xs text-gray-400 mb-1">NOMOR BATCH *</label> <input type="text" id="input-batch" required placeholder="MASUKKAN NO. BATCH" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500 placeholder-gray-500">
          </div>
          <div><label class="block text-xs text-gray-400 mb-1">INISIAL OPERATOR *</label> <select id="input-operator" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500"> <option value="">PILIH OPERATOR</option> </select>
-         </div>
+        </div>
         </div>
         <div><label class="block text-xs text-gray-400 mb-1">DESKRIPSI TEMUAN PPI *</label> <textarea id="input-description" required rows="4" placeholder="JELASKAN TEMUAN SECARA DETAIL..." class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-emerald-500 placeholder-gray-500 resize-none"></textarea>
         </div>
@@ -334,7 +342,7 @@
        <div class="flex-1 min-w-[120px]"><label class="block text-xs text-gray-400 mb-1">KATEGORI</label> <select id="audit-filter-category" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <option value="">SEMUA</option> </select>
        </div>
        <div class="flex-1 min-w-[120px]"><label class="block text-xs text-gray-400 mb-1">INISIAL</label> <select id="audit-filter-initial" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"> <option value="">SEMUA</option> </select>
-       </div><button id="audit-filter-btn" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition">🔍 FILTER</button> <button id="audit-reset-btn" class="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded-lg text-sm font-medium transition">↺ RESET</button> <button id="export-pdf" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition">📄 EXPORT PDF</button>
+       </div><button id="audit-filter-btn" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-medium transition">🔍 FILTER</button> <button id="audit-reset-btn" class="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded-lg text-sm font-medium transition">↺ RESET</button> <button id="export-pdf-audit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition">📄 EXPORT PDF</button>
       </div>
      </div>
      <div class="bg-gray-800 rounded-xl p-5 card-shadow border border-gray-700">
@@ -406,6 +414,7 @@
     let deleteCallback = null;
     let editCallback = null;
     let charts = {};
+    let currentFilteredFindings = []; // Untuk menyimpan data yang difilter
 
     // Supabase Real-time Subscriptions
     let subscriptions = [];
@@ -734,32 +743,32 @@
       const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
       // Apply filters
-      let filteredFindings = [...findings];
+      currentFilteredFindings = [...findings];
       const dateFrom = document.getElementById('filter-date-from').value;
       const dateTo = document.getElementById('filter-date-to').value;
 
-      if (dateFrom) filteredFindings = filteredFindings.filter(f => f.date >= dateFrom);
-      if (dateTo) filteredFindings = filteredFindings.filter(f => f.date <= dateTo);
+      if (dateFrom) currentFilteredFindings = currentFilteredFindings.filter(f => f.date >= dateFrom);
+      if (dateTo) currentFilteredFindings = currentFilteredFindings.filter(f => f.date <= dateTo);
       
       // Multi-select filters
       if (selectedFilters.areas.size > 0) {
-        filteredFindings = filteredFindings.filter(f => selectedFilters.areas.has(f.area_name));
+        currentFilteredFindings = currentFilteredFindings.filter(f => selectedFilters.areas.has(f.area_name));
       }
       if (selectedFilters.products.size > 0) {
-        filteredFindings = filteredFindings.filter(f => selectedFilters.products.has(f.product_name));
+        currentFilteredFindings = currentFilteredFindings.filter(f => selectedFilters.products.has(f.product_name));
       }
       if (selectedFilters.categories.size > 0) {
-        filteredFindings = filteredFindings.filter(f => selectedFilters.categories.has(f.category_name));
+        currentFilteredFindings = currentFilteredFindings.filter(f => selectedFilters.categories.has(f.category_name));
       }
       if (selectedFilters.operators.size > 0) {
-        filteredFindings = filteredFindings.filter(f => selectedFilters.operators.has(f.operator_name));
+        currentFilteredFindings = currentFilteredFindings.filter(f => selectedFilters.operators.has(f.operator_name));
       }
 
       // Summary cards - show filtered total
-      document.getElementById('total-findings').textContent = filteredFindings.length;
+      document.getElementById('total-findings').textContent = currentFilteredFindings.length;
 
       // Calculate unique batch numbers with findings
-      const uniqueBatches = new Set(filteredFindings.map(f => f.batch_number).filter(b => b));
+      const uniqueBatches = new Set(currentFilteredFindings.map(f => f.batch_number).filter(b => b));
       document.getElementById('unique-batches').textContent = uniqueBatches.size;
 
       // Determine which months are covered by the filter
@@ -799,7 +808,7 @@
           isValidForBRFT = true;
           
           // Count UNIQUE BATCHES with findings (not total findings)
-          const uniqueBatchSet = new Set(filteredFindings.map(f => f.batch_number).filter(b => b));
+          const uniqueBatchSet = new Set(currentFilteredFindings.map(f => f.batch_number).filter(b => b));
           uniqueBatchesForBRFT = uniqueBatchSet.size;
           
           // Sum up targets for all covered months
@@ -815,7 +824,7 @@
         isValidForBRFT = true;
         
         // Count UNIQUE BATCHES with findings (not total findings)
-        const uniqueBatchSet = new Set(filteredFindings.map(f => f.batch_number).filter(b => b));
+        const uniqueBatchSet = new Set(currentFilteredFindings.map(f => f.batch_number).filter(b => b));
         uniqueBatchesForBRFT = uniqueBatchSet.size;
         
         const monthTarget = targets.find(t => t.target_month === currentMonth);
@@ -844,10 +853,10 @@
       }
 
       // Update charts
-      updateCharts(filteredFindings);
+      updateCharts(currentFilteredFindings);
 
       // Update table
-      updateFindingsTable(filteredFindings);
+      updateFindingsTable(currentFilteredFindings);
     }
 
     // Update Charts
@@ -1067,11 +1076,11 @@
     function updateFindingsTable(filteredFindings) {
       const tbody = document.getElementById('findings-table');
       if (filteredFindings.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-gray-500">TIDAK ADA DATA</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-gray-500">TIDAK ADA DATA</td></tr>';
         return;
       }
 
-      tbody.innerHTML = filteredFindings.sort((a, b) => new Date(a.date) - new Date(b.date)).map(f => {
+      tbody.innerHTML = filteredFindings.sort((a, b) => new Date(a.date) - new Date(b.date)).map((f, index) => {
         // Format date as dd MMM YYYY (e.g., 22 JAN 2026)
         let formattedDate = '-';
         if (f.date) {
@@ -1082,6 +1091,7 @@
 
         return `
           <tr class="hover:bg-gray-700/50">
+            <td class="py-3 px-3 text-gray-300">${index + 1}</td>
             <td class="py-3 px-3 text-gray-300">${formattedDate}</td>
             <td class="py-3 px-3 text-gray-300">${f.operator_initial || '-'}</td>
             <td class="py-3 px-3 text-gray-300">${f.area || '-'}</td>
@@ -1560,12 +1570,168 @@
       updateAuditTable();
     });
 
-    // Export PDF
-    document.getElementById('export-pdf').addEventListener('click', () => {
+    // Export PDF for Findings
+    document.getElementById('export-pdf-findings').addEventListener('click', () => {
+      if (currentFilteredFindings.length === 0) {
+        showToast('TIDAK ADA DATA UNTUK DIEXPORT', 'error');
+        return;
+      }
+
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
-      // Get filtered logs (same as currently displayed in table)
+      // Header
+      doc.setFontSize(16);
+      doc.text('LAPORAN DETAIL TEMUAN BRFT', 105, 15, { align: 'center' });
+      
+      // Filter info
+      const dateFrom = document.getElementById('filter-date-from').value;
+      const dateTo = document.getElementById('filter-date-to').value;
+      const filterInfo = dateFrom && dateTo ? 
+        `Periode: ${dateFrom} s/d ${dateTo}` : 
+        'Periode: Semua Data';
+      
+      doc.setFontSize(10);
+      doc.text(filterInfo, 105, 22, { align: 'center' });
+      doc.text(`Generated: ${new Date().toLocaleString('ID-id')}`, 105, 28, { align: 'center' });
+      doc.text(`Total Temuan: ${currentFilteredFindings.length}`, 105, 34, { align: 'center' });
+
+      // Table headers
+      let y = 45;
+      doc.setFontSize(9);
+      doc.setFillColor(40, 40, 40);
+      doc.setTextColor(255, 255, 255);
+      doc.rect(15, y-5, 180, 7, 'F');
+      
+      doc.text('NO', 17, y);
+      doc.text('TANGGAL', 30, y);
+      doc.text('INISIAL', 60, y);
+      doc.text('AREA', 75, y);
+      doc.text('KATEGORI', 95, y);
+      doc.text('NO. BATCH', 115, y);
+      doc.text('TEMUAN PPI', 140, y);
+
+      y += 5;
+      doc.setTextColor(0, 0, 0);
+      
+      // Table data
+      doc.setFontSize(8);
+      currentFilteredFindings.sort((a, b) => new Date(a.date) - new Date(b.date)).forEach((f, index) => {
+        if (y > 280) {
+          doc.addPage();
+          y = 20;
+          // Repeat header on new page
+          doc.setFontSize(9);
+          doc.setFillColor(40, 40, 40);
+          doc.setTextColor(255, 255, 255);
+          doc.rect(15, y-5, 180, 7, 'F');
+          doc.text('NO', 17, y);
+          doc.text('TANGGAL', 30, y);
+          doc.text('INISIAL', 60, y);
+          doc.text('AREA', 75, y);
+          doc.text('KATEGORI', 95, y);
+          doc.text('NO. BATCH', 115, y);
+          doc.text('TEMUAN PPI', 140, y);
+          y += 5;
+          doc.setTextColor(0, 0, 0);
+        }
+
+        // Format date
+        let formattedDate = '-';
+        if (f.date) {
+          const [year, month, day] = f.date.split('-');
+          const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+          formattedDate = `${day} ${monthNames[parseInt(month) - 1]} ${year}`;
+        }
+
+        doc.text(`${index + 1}`, 17, y);
+        doc.text(formattedDate, 30, y);
+        doc.text(f.operator_initial || '-', 60, y);
+        doc.text(f.area || '-', 75, y);
+        doc.text(f.category || '-', 95, y);
+        doc.text(f.batch_number || '-', 115, y);
+        
+        // Description with line wrapping
+        const desc = f.description || '-';
+        const maxWidth = 55;
+        const lines = doc.splitTextToSize(desc, maxWidth);
+        
+        lines.forEach((line, idx) => {
+          if (y > 280) {
+            doc.addPage();
+            y = 20;
+          }
+          if (idx === 0) {
+            doc.text(line, 140, y);
+          } else {
+            doc.text(line, 140, y);
+          }
+          if (idx < lines.length - 1) y += 4;
+        });
+        
+        y += 6;
+      });
+
+      // Footer
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      doc.text('BRFT Monitoring System - Created by MSTD', 105, 290, { align: 'center' });
+
+      doc.save(`BRFT_TEMUAN_${new Date().toISOString().split('T')[0]}.pdf`);
+      showToast('PDF TEMUAN BERHASIL DIEXPORT', 'success');
+    });
+
+    // Export Excel for Findings
+    document.getElementById('export-excel-findings').addEventListener('click', () => {
+      if (currentFilteredFindings.length === 0) {
+        showToast('TIDAK ADA DATA UNTUK DIEXPORT', 'error');
+        return;
+      }
+
+      // Prepare data for Excel
+      const excelData = currentFilteredFindings.sort((a, b) => new Date(a.date) - new Date(b.date)).map((f, index) => {
+        // Format date
+        let formattedDate = '-';
+        if (f.date) {
+          const [year, month, day] = f.date.split('-');
+          const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+          formattedDate = `${day} ${monthNames[parseInt(month) - 1]} ${year}`;
+        }
+
+        return {
+          NO: index + 1,
+          TANGGAL: formattedDate,
+          INISIAL: f.operator_initial || '-',
+          AREA: f.area || '-',
+          KATEGORI: f.category || '-',
+          'NO. BATCH': f.batch_number || '-',
+          'TEMUAN PPI': f.description || '-'
+        };
+      });
+
+      // Create worksheet
+      const ws = XLSX.utils.json_to_sheet(excelData);
+      
+      // Create workbook
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Temuan BRFT");
+      
+      // Add header info
+      const dateFrom = document.getElementById('filter-date-from').value;
+      const dateTo = document.getElementById('filter-date-to').value;
+      const filterInfo = dateFrom && dateTo ? 
+        `Periode: ${dateFrom} s/d ${dateTo}` : 
+        'Periode: Semua Data';
+      
+      // Write to file
+      const fileName = `BRFT_TEMUAN_${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      
+      showToast('EXCEL TEMUAN BERHASIL DIEXPORT', 'success');
+    });
+
+    // Export PDF for Audit
+    document.getElementById('export-pdf-audit').addEventListener('click', () => {
       const dateFrom = document.getElementById('audit-date-from').value;
       const dateTo = document.getElementById('audit-date-to').value;
       const area = document.getElementById('audit-filter-area').value;
@@ -1585,6 +1751,9 @@
         showToast('TIDAK ADA DATA UNTUK DIEXPORT', 'error');
         return;
       }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
 
       doc.setFontSize(16);
       doc.text('BRFT AUDIT TRAIL REPORT', 105, 20, { align: 'center' });
@@ -1637,7 +1806,7 @@
       });
 
       doc.save(`BRFT_AUDIT_${new Date().toISOString().split('T')[0]}.pdf`);
-      showToast('PDF BERHASIL DIEXPORT', 'success');
+      showToast('PDF AUDIT BERHASIL DIEXPORT', 'success');
     });
 
     // Theme Toggle
